@@ -57,7 +57,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   // For image switching animation
   late Timer _imageSwitchTimer;
-  int _currentImageSet = 0; // 0 = original, 1 = page2, 2 = page3
+  int _currentImageSet = 0; // 0-5 for different sets
 
   @override
   void initState() {
@@ -91,7 +91,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     // Initialize image switch timer
     _imageSwitchTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
       setState(() {
-        _currentImageSet = (_currentImageSet + 1) % 3; // Cycle through 0, 1, 2
+        _currentImageSet = (_currentImageSet + 1) % 6; // Cycle through 0-5
       });
     });
   }
@@ -136,25 +136,97 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Widget _buildLeftImageColumn(List<String> images, BuildContext context) {
+    if (_currentImageSet == 5) {
+      // Page 6 set
+      return SizedBox(
+        width: 220,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Image.asset(
+              '/page6_left.jpg',
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) =>
+                  const Icon(Icons.image, size: 150, color: Colors.blue),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Our commitments to Excellence',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue,
+              ),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'Empowering every child to discover the joy of learning & achieve their full potential.',
+              style: TextStyle(fontSize: 14),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              '- To inspire and equip children with the skills and confidence to learn effectively & pursue their curiosity.',
+              style: TextStyle(fontSize: 14),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              '- Guiding children to become confident, lifelong learners who love to explore & grow.',
+              style: TextStyle(fontSize: 14),
+            ),
+          ],
+        ),
+      );
+    }
+
     String left1Image;
     String left2Image;
-    String leftText;
+    String left3Image;
+    String left4Image;
+    String? leftText;
 
-    if (_currentImageSet == 0) {
-      // Original set
-      left1Image = images[0];
-      left2Image = images[1];
-      leftText = 'A-Level Apps';
-    } else if (_currentImageSet == 1) {
-      // Page 2 set
-      left1Image = '/page2_left.jpg';
-      left2Image = images[1];
-      leftText = 'GCSE Apps';
-    } else {
-      // Page 3 set
-      left1Image = '/page3_left1.jpg';
-      left2Image = '/page3_left2.png';
-      leftText = '11+ Apps';
+    switch (_currentImageSet) {
+      case 0: // Original set
+        left1Image = images[0];
+        left2Image = images[1];
+        left3Image = images[2];
+        left4Image = '';
+        leftText = 'A-Level Apps';
+        break;
+      case 1: // Page 2 set
+        left1Image = '/page2_left.jpg';
+        left2Image = images[1];
+        left3Image = images[2];
+        left4Image = '';
+        leftText = 'GCSE Apps';
+        break;
+      case 2: // Page 3 set
+        left1Image = '/page3_left1.jpg';
+        left2Image = '/page3_left2.png';
+        left3Image = images[2];
+        left4Image = '';
+        leftText = '11+ Apps';
+        break;
+      case 3: // Page 4 set
+        left1Image = '/page4_left1.png';
+        left2Image = '/page4_left2.jpg';
+        left3Image = '/page4_left3.jpg';
+        left4Image = '';
+        leftText = 'KS2 Apps';
+        break;
+      case 4: // Page 5 set
+        left1Image = '/page5_left1.png';
+        left2Image = '/page5_left2.png';
+        left3Image = '/page5_left3.png';
+        left4Image = '/page5_left4.png';
+        leftText = null;
+        break;
+      default:
+        left1Image = images[0];
+        left2Image = images[1];
+        left3Image = images[2];
+        left4Image = '';
+        leftText = 'A-Level Apps';
     }
 
     return SizedBox(
@@ -163,47 +235,122 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildImageItem(left1Image),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: Text(
-              leftText,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue[800],
+          if (leftText != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Text(
+                leftText,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue[800],
+                ),
               ),
             ),
-          ),
           _buildImageItem(left2Image),
-          _buildImageItem(images[2]),
+          _buildImageItem(left3Image),
+          if (left4Image.isNotEmpty) _buildImageItem(left4Image),
         ],
       ),
     );
   }
 
   Widget _buildRightImageColumn(List<String> images, BuildContext context) {
-    String rightText;
+    if (_currentImageSet == 5) {
+      // Page 6 set
+      return SizedBox(
+        width: 220,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                // Main Assessment Button
+                Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.blue[800],
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.blue.withOpacity(0.5),
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: const Center(
+                    child: Text(
+                      'Instant Assessment\nPowered by kAI',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ),
+                // Assessment options (always visible)
+                Positioned(top: 0, child: _buildAssessmentOption('SAT', 0)),
+                Positioned(right: 0, child: _buildAssessmentOption('11+', 1)),
+                Positioned(
+                  bottom: 0,
+                  child: _buildAssessmentOption('GCSEs', 2),
+                ),
+                Positioned(
+                  left: 0,
+                  child: _buildAssessmentOption('A-Levels', 3),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    }
+
+    String? rightText;
     List<String> rightImagePaths;
 
-    if (_currentImageSet == 0) {
-      // Original set
-      rightText = 'A-Level Exam Papers';
-      rightImagePaths = images;
-    } else if (_currentImageSet == 1) {
-      // Page 2 set
-      rightText = 'GCSE Exam Papers';
-      rightImagePaths = images;
-    } else {
-      // Page 3 set
-      rightText = '11+ Exam Papers';
-      rightImagePaths = [
-        '/page3_right1.png',
-        '/page3_right2.png',
-        '/page3_right3.png',
-        '/page3_right4.png',
-        '/page3_right5.png',
-        '/page3_right6.png',
-      ];
+    switch (_currentImageSet) {
+      case 0: // Original set
+        rightText = 'A-Level Exam Papers';
+        rightImagePaths = images;
+        break;
+      case 1: // Page 2 set
+        rightText = 'GCSE Exam Papers';
+        rightImagePaths = images;
+        break;
+      case 2: // Page 3 set
+        rightText = '11+ Exam Papers';
+        rightImagePaths = [
+          '/page3_right1.png',
+          '/page3_right2.png',
+          '/page3_right3.png',
+          '/page3_right4.png',
+          '/page3_right5.png',
+          '/page3_right6.png',
+        ];
+        break;
+      case 3: // Page 4 set
+        rightText = 'KS2 Test Papers';
+        rightImagePaths = [
+          '/page4_right1.png',
+          '/page4_right2.png',
+          '/page4_right3.png',
+          '/page4_right4.png',
+          '/amazon.png',
+        ];
+        break;
+      case 4: // Page 5 set
+        rightText = null;
+        rightImagePaths = ['/page5_right1.png', '/page5_right2.png'];
+        break;
+      default:
+        rightText = 'A-Level Exam Papers';
+        rightImagePaths = images;
     }
 
     return SizedBox(
@@ -211,24 +358,90 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: Text(
-              rightText,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue[800],
+          if (rightText != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Text(
+                rightText,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue[800],
+                ),
               ),
             ),
-          ),
           for (int i = 0; i < rightImagePaths.length; i++)
-            i < 4 && _currentImageSet != 2
-                ? _buildImageItemWithCircle(rightImagePaths[i], circleIndex: i)
-                : _buildImageItem(rightImagePaths[i]),
+            Column(
+              children: [
+                if (_currentImageSet == 4)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Text(
+                      'Activity Book ${i + 1}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue[800],
+                      ),
+                    ),
+                  ),
+                _currentImageSet < 2 && i < 4
+                    ? _buildImageItemWithCircle(
+                        rightImagePaths[i],
+                        circleIndex: i,
+                      )
+                    : _buildImageItem(rightImagePaths[i]),
+              ],
+            ),
         ],
       ),
     );
+  }
+
+  Widget _buildAssessmentOption(String label, int position) {
+    final colors = [Colors.red, Colors.green, Colors.orange, Colors.purple];
+    return Transform.translate(
+      offset: _getAssessmentOptionOffset(position),
+      child: Container(
+        width: 60,
+        height: 60,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: colors[position],
+          boxShadow: [
+            BoxShadow(
+              color: colors[position].withOpacity(0.5),
+              blurRadius: 8,
+              spreadRadius: 1,
+            ),
+          ],
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Offset _getAssessmentOptionOffset(int position) {
+    switch (position) {
+      case 0: // Top
+        return const Offset(0, -80);
+      case 1: // Right
+        return const Offset(80, 0);
+      case 2: // Bottom
+        return const Offset(0, 80);
+      case 3: // Left
+        return const Offset(-80, 0);
+      default:
+        return Offset.zero;
+    }
   }
 
   Widget _buildImageItemWithCircle(
@@ -272,48 +485,96 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Widget _buildCenterBookImage(BuildContext context) {
-    String centerText;
-    Widget centerImage;
-
-    if (_currentImageSet == 0) {
-      // Original set
-      centerText = 'A-Level Exercises Books';
-      centerImage = Image.asset(
-        '/book_center.png',
-        fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) =>
-            const Icon(Icons.menu_book, size: 150, color: Colors.blue),
-      );
-    } else if (_currentImageSet == 1) {
-      // Page 2 set
-      centerText = 'GCSE Exercise Books';
-      centerImage = Image.asset(
-        '/page2_center.png',
-        fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) =>
-            const Icon(Icons.menu_book, size: 150, color: Colors.blue),
-      );
-    } else {
-      // Page 3 set
-      centerText = '11+ Exercise Books';
-      centerImage = Column(
+    if (_currentImageSet == 5) {
+      // Page 6 set
+      return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Image.asset(
-            '/page3_center_top.png',
+            '/page6_center1.png',
+            width: 400,
             fit: BoxFit.contain,
             errorBuilder: (context, error, stackTrace) =>
-                const Icon(Icons.menu_book, size: 75, color: Colors.blue),
+                const Icon(Icons.image, size: 150, color: Colors.blue),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 20),
           Image.asset(
-            '/page3_center_bottom.png',
+            '/page6_center2.png',
+            width: 400,
             fit: BoxFit.contain,
             errorBuilder: (context, error, stackTrace) =>
-                const Icon(Icons.menu_book, size: 75, color: Colors.blue),
+                const Icon(Icons.image, size: 150, color: Colors.blue),
           ),
         ],
       );
+    }
+
+    String centerText;
+    Widget centerImage;
+
+    switch (_currentImageSet) {
+      case 0: // Original set
+        centerText = 'A-Level Exercises Books';
+        centerImage = Image.asset(
+          '/book_center.png',
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) =>
+              const Icon(Icons.menu_book, size: 150, color: Colors.blue),
+        );
+        break;
+      case 1: // Page 2 set
+        centerText = 'GCSE Exercise Books';
+        centerImage = Image.asset(
+          '/page2_center.png',
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) =>
+              const Icon(Icons.menu_book, size: 150, color: Colors.blue),
+        );
+        break;
+      case 2: // Page 3 set
+        centerText = 'Exercise Books';
+        centerImage = Image.asset(
+          '/page3_center_top.png',
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) =>
+              const Icon(Icons.menu_book, size: 150, color: Colors.blue),
+        );
+        break;
+      case 3: // Page 4 set
+        centerText = 'KS2 Exercise Books';
+        centerImage = Image.asset(
+          '/page3_center_bottom.png',
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) =>
+              const Icon(Icons.menu_book, size: 150, color: Colors.blue),
+        );
+        break;
+      case 4: // Page 5 set
+        centerText = 'Activity Books Collection';
+        centerImage = Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (int i = 1; i <= 5; i++)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Image.asset(
+                  '/page5_center$i.png',
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const Icon(Icons.menu_book, size: 50, color: Colors.blue),
+                ),
+              ),
+          ],
+        );
+        break;
+      default:
+        centerText = 'A-Level Exercises Books';
+        centerImage = Image.asset(
+          '/book_center.png',
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) =>
+              const Icon(Icons.menu_book, size: 150, color: Colors.blue),
+        );
     }
 
     return Stack(
