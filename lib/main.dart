@@ -11,13 +11,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Education App',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
+      title: 'Learning Stack',
+      theme: ThemeData(primarySwatch: Colors.blue),
       home: const HomePage(),
-      debugShowCheckedModeBanner: false,
     );
   }
 }
