@@ -38,13 +38,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     {'icon': Icons.email, 'label': 'Email', 'color': Colors.purple},
   ];
 
-  final List<String> leftImages = ['/left_1.jpg', '/left_2.png', '/left_3.png'];
+  final List<String> leftImages = [
+    'assets/left_1.jpg',
+    'assets/left_2.png',
+    'assets/left_3.png',
+  ];
   final List<String> rightImages = [
-    '/right_1.png',
-    '/right_2.png',
-    '/right_3.png',
-    '/right_4.png',
-    '/amazon.png',
+    'assets/right_1.png',
+    'assets/right_2.png',
+    'assets/right_3.png',
+    'assets/right_4.png',
+    'assets/amazon.png',
   ];
 
   final List<String> infoItems = [
@@ -242,7 +246,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           ),
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
-            child: Image.asset('/appbar_right.png'),
+            child: Image.asset('assets/appbar_right.png'),
           ),
         ],
       ],
@@ -267,7 +271,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Image.asset(
-                '/page6_left.jpg',
+                'assets/page6_left.jpg',
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) => Icon(
                   Icons.image,
@@ -320,31 +324,31 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         leftText = 'A-Level Apps';
         break;
       case 1:
-        left1Image = '/page2_left.jpg';
+        left1Image = 'assets/page2_left.jpg';
         left2Image = images[1];
         left3Image = images[2];
         left4Image = '';
         leftText = 'GCSE Apps';
         break;
       case 2:
-        left1Image = '/page3_left1.jpg';
-        left2Image = '/page3_left2.png';
+        left1Image = 'assets/page3_left1.jpg';
+        left2Image = 'assets/page3_left2.png';
         left3Image = images[2];
         left4Image = '';
         leftText = '11+ Apps';
         break;
       case 3:
-        left1Image = '/page4_left1.png';
-        left2Image = '/page4_left2.jpg';
-        left3Image = '/page4_left3.jpg';
+        left1Image = 'assets/page4_left1.png';
+        left2Image = 'assets/page4_left2.jpg';
+        left3Image = 'assets/page4_left3.jpg';
         left4Image = '';
         leftText = 'KS2 Apps';
         break;
       case 4:
-        left1Image = '/page5_left1.png';
-        left2Image = '/page5_left2.png';
-        left3Image = '/page5_left3.png';
-        left4Image = '/page5_left4.png';
+        left1Image = 'assets/page5_left1.png';
+        left2Image = 'assets/page5_left2.png';
+        left3Image = 'assets/page5_left3.png';
+        left4Image = 'assets/page5_left4.png';
         leftText = null;
         break;
       default:
@@ -465,27 +469,30 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       case 2:
         rightText = '11+ Exam Papers';
         rightImagePaths = [
-          '/page3_right1.png',
-          '/page3_right2.png',
-          '/page3_right3.png',
-          '/page3_right4.png',
-          '/page3_right5.png',
-          '/page3_right6.png',
+          'assets/page3_right1.png',
+          'assets/page3_right2.png',
+          'assets/page3_right3.png',
+          'assets/page3_right4.png',
+          'assets/page3_right5.png',
+          'assets/page3_right6.png',
         ];
         break;
       case 3:
         rightText = 'KS2 Test Papers';
         rightImagePaths = [
-          '/page4_right1.png',
-          '/page4_right2.png',
-          '/page4_right3.png',
-          '/page4_right4.png',
-          '/amazon.png',
+          'assets/page4_right1.png',
+          'assets/page4_right2.png',
+          'assets/page4_right3.png',
+          'assets/page4_right4.png',
+          'assets/amazon.png',
         ];
         break;
       case 4:
         rightText = null;
-        rightImagePaths = ['/page5_right1.png', '/page5_right2.png'];
+        rightImagePaths = [
+          'assets/page5_right1.png',
+          'assets/page5_right2.png',
+        ];
         break;
       default:
         rightText = 'A-Level Exam Papers';
@@ -672,7 +679,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: Image.asset(
-              '/page6_center1.png',
+              'assets/page6_center1.png',
               width: centerWidth.toDouble(),
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) => Icon(
@@ -686,7 +693,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: Image.asset(
-              '/page6_center2.png',
+              'assets/page6_center2.png',
               width: centerWidth.toDouble(),
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) => Icon(
@@ -707,7 +714,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       case 0:
         centerText = 'A-Level Exercises Books';
         centerImage = Image.asset(
-          '/book_center.png',
+          'assets/book_center.png',
           fit: BoxFit.contain,
           errorBuilder: (context, error, stackTrace) => Icon(
             Icons.menu_book,
@@ -719,7 +726,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       case 1:
         centerText = 'GCSE Exercise Books';
         centerImage = Image.asset(
-          '/page2_center.png',
+          'assets/page2_center.png',
           fit: BoxFit.contain,
           errorBuilder: (context, error, stackTrace) => Icon(
             Icons.menu_book,
@@ -731,7 +738,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       case 2:
         centerText = 'Exercise Books';
         centerImage = Image.asset(
-          '/page3_center_top.png',
+          'assets/page3_center_top.png',
           fit: BoxFit.contain,
           errorBuilder: (context, error, stackTrace) => Icon(
             Icons.menu_book,
@@ -743,7 +750,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       case 3:
         centerText = 'KS2 Exercise Books';
         centerImage = Image.asset(
-          '/page3_center_bottom.png',
+          'assets/page3_center_bottom.png',
           fit: BoxFit.contain,
           errorBuilder: (context, error, stackTrace) => Icon(
             Icons.menu_book,
@@ -763,7 +770,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.asset(
-                    '/page5_center$i.png',
+                    'assets/page5_center$i.png',
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) => Icon(
                       Icons.menu_book,
@@ -779,7 +786,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       default:
         centerText = 'A-Level Exercises Books';
         centerImage = Image.asset(
-          '/book_center.png',
+          'assets/book_center.png',
           fit: BoxFit.contain,
           errorBuilder: (context, error, stackTrace) => Icon(
             Icons.menu_book,
@@ -830,7 +837,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           Positioned(
             top: 290,
             left: 150,
-            child: _buildImageItem('/amazon.png', context),
+            child: _buildImageItem('assets/amazon.png', context),
           ),
       ],
     );
@@ -873,7 +880,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       ],
                     ),
                     child: Image.asset(
-                      '/little_robot.png',
+                      'assets/little_robot.png',
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) => Icon(
                         Icons.person,
@@ -1239,7 +1246,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   right: 0,
                   child: Center(
                     child: Image.asset(
-                      '/ninja.png',
+                      'assets/ninja.png',
                       height: isMobile ? 200 : 300,
                       width: isMobile ? 200 : 300,
                       errorBuilder: (context, error, stackTrace) => Icon(
