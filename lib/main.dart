@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:learning_stack_v2/home_page.dart';
+import 'screens/home_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,9 +11,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Learning Stack',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      title: 'Learning Adventure',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
       home: const HomePage(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
