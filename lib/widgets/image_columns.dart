@@ -79,17 +79,11 @@ class LeftImageColumn extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // First image
-              ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxHeight: 200,
-                  maxWidth: availableWidth,
-                ),
-                child: _buildImageItem('assets/page6_left.jpg', context),
-              ),
+              // Collage-style image display
+              _buildCollageLayout(context, availableWidth),
               const SizedBox(height: 16),
 
-              // Text content replacing second image
+              // Text content
               Text(
                 'Our commitments to Excellence',
                 style: GoogleFonts.fredoka(
@@ -122,16 +116,6 @@ class LeftImageColumn extends StatelessWidget {
                   color: Colors.grey.shade800,
                 ),
               ),
-              const SizedBox(height: 16),
-
-              // Third image
-              ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxHeight: 200,
-                  maxWidth: availableWidth,
-                ),
-                child: _buildImageItem('assets/left_3.png', context),
-              ),
             ],
           ),
         );
@@ -151,11 +135,7 @@ class LeftImageColumn extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
-              _buildImageItem('assets/left_1.jpg', context),
-              const SizedBox(height: 16),
-              _buildImageItem('assets/left_2.png', context),
-              const SizedBox(height: 16),
-              _buildImageItem('assets/left_3.png', context),
+              _buildCollageLayout(context, availableWidth),
             ],
           ),
         );
@@ -175,11 +155,7 @@ class LeftImageColumn extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
-              _buildImageItem('assets/page2_left.jpg', context),
-              const SizedBox(height: 16),
-              _buildImageItem('assets/left_2.png', context),
-              const SizedBox(height: 16),
-              _buildImageItem('assets/left_3.png', context),
+              _buildCollageLayout(context, availableWidth),
             ],
           ),
         );
@@ -199,11 +175,7 @@ class LeftImageColumn extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
-              _buildImageItem('assets/page3_left1.jpg', context),
-              const SizedBox(height: 16),
-              _buildImageItem('assets/page3_left2.png', context),
-              const SizedBox(height: 16),
-              _buildImageItem('assets/left_3.png', context),
+              _buildCollageLayout(context, availableWidth),
             ],
           ),
         );
@@ -223,15 +195,21 @@ class LeftImageColumn extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
-              _buildImageItem('assets/page4_left1.png', context),
-              const SizedBox(height: 16),
-              _buildImageItem('assets/page4_left2.jpg', context),
-              const SizedBox(height: 16),
-              _buildImageItem('assets/page4_left3.jpg', context),
+              _buildCollageLayout(context, availableWidth),
             ],
           ),
         );
       case 5: // A-Levels
+        final isSmall = screenSize == ScreenSize.small;
+        final aLevelImages = [
+          'assets/page5_left1.png',
+          'assets/page5_left2.png',
+          'assets/page5_left3.png',
+          'assets/page5_left4.png',
+          'assets/page5_center1.png',
+          'assets/page5_center2.png',
+        ];
+
         return SizedBox(
           width: availableWidth,
           child: Column(
@@ -240,23 +218,22 @@ class LeftImageColumn extends StatelessWidget {
               Text(
                 'A-Level Apps',
                 style: GoogleFonts.fredoka(
-                  fontSize: screenSize == ScreenSize.small ? 14 : 20,
+                  fontSize: isSmall ? 14 : 20,
                   fontWeight: FontWeight.bold,
                   color: Colors.purple.shade800,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
-              _buildImageItem('assets/page5_left1.png', context),
-              const SizedBox(height: 16),
-              _buildImageItem('assets/page5_left2.png', context),
-              const SizedBox(height: 16),
-              _buildImageItem('assets/page5_left3.png', context),
-              const SizedBox(height: 16),
-              _buildImageItem('assets/page5_left4.png', context),
+              _buildCollageLayout(
+                context,
+                availableWidth,
+                images: aLevelImages,
+              ),
             ],
           ),
         );
+
       default:
         return SizedBox(
           width: availableWidth,
@@ -273,18 +250,112 @@ class LeftImageColumn extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
-              _buildImageItem('assets/page6_left.jpg', context),
-              const SizedBox(height: 16),
-              _buildImageItem('assets/left_2.png', context),
-              const SizedBox(height: 16),
-              _buildImageItem('assets/left_3.png', context),
+              _buildCollageLayout(context, availableWidth),
             ],
           ),
         );
     }
   }
 
-  Widget _buildImageItem(String imagePath, BuildContext context) {
+  Widget _buildCollageLayout(
+    BuildContext context,
+    double availableWidth, {
+    List<String>? images,
+  }) {
+    final screenSize = ScreenSizeUtils.getScreenSize(context);
+    final isSmall = screenSize == ScreenSize.small;
+
+    // Default images if not provided
+    final collageImages =
+        images ??
+        ['assets/page6_left.jpg', 'assets/left_2.png', 'assets/left_3.png'];
+
+    if (isSmall) {
+      // Mobile layout - grid view
+      return GridView.count(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 1,
+        children: collageImages.map((path) {
+          return _buildImageItem(path, context);
+        }).toList(),
+      );
+    } else {
+      // Desktop layout - creative collage
+      return SizedBox(
+        width: availableWidth,
+        child: Column(
+          children: [
+            // First row with one large image
+            _buildImageItem(collageImages[0], context, height: 200),
+            const SizedBox(height: 16),
+
+            // Second row with two smaller images
+            Row(
+              children: [
+                Expanded(
+                  child: _buildImageItem(
+                    collageImages.length > 1
+                        ? collageImages[1]
+                        : collageImages[0],
+                    context,
+                    height: 150,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: _buildImageItem(
+                    collageImages.length > 2
+                        ? collageImages[2]
+                        : collageImages[0],
+                    context,
+                    height: 150,
+                  ),
+                ),
+              ],
+            ),
+
+            // Third row with staggered layout if more images
+            if (collageImages.length > 3) ...[
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: _buildImageItem(
+                      collageImages[3],
+                      context,
+                      height: 180,
+                    ),
+                  ),
+                  if (collageImages.length > 4) ...[
+                    const SizedBox(width: 16),
+                    Expanded(
+                      flex: 1,
+                      child: _buildImageItem(
+                        collageImages[4],
+                        context,
+                        height: 180,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ],
+          ],
+        ),
+      );
+    }
+  }
+
+  Widget _buildImageItem(
+    String imagePath,
+    BuildContext context, {
+    double? height,
+  }) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -294,8 +365,9 @@ class LeftImageColumn extends StatelessWidget {
         child: Image.asset(
           imagePath,
           fit: BoxFit.cover,
+          height: height,
           errorBuilder: (context, error, stackTrace) => Container(
-            height: 200,
+            height: height ?? 200,
             color: Colors.purple.shade50,
             child: Icon(Icons.image, size: 50, color: Colors.purple.shade300),
           ),
@@ -531,23 +603,82 @@ class _RightImageColumnState extends State<RightImageColumn> {
               textAlign: TextAlign.center,
             ),
           ),
-          Column(
-            children: rightImagePaths.map((imagePath) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxHeight: 200,
-                    maxWidth: availableWidth,
-                  ),
-                  child: _buildImageItem(imagePath, context),
-                ),
-              );
-            }).toList(),
-          ),
+          _buildCollageLayout(context, availableWidth, images: rightImagePaths),
         ],
       ),
     );
+  }
+
+  Widget _buildCollageLayout(
+    BuildContext context,
+    double availableWidth, {
+    required List<String> images,
+  }) {
+    final screenSize = ScreenSizeUtils.getScreenSize(context);
+    final isSmall = screenSize == ScreenSize.small;
+
+    if (isSmall) {
+      return GridView.count(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 1,
+        children: images.map((path) {
+          return _buildImageItem(path, context);
+        }).toList(),
+      );
+    } else {
+      return Column(
+        children: [
+          // First row with two images
+          Row(
+            children: [
+              Expanded(child: _buildImageItem(images[0], context, height: 180)),
+              const SizedBox(width: 16),
+              Expanded(
+                child: _buildImageItem(
+                  images.length > 1 ? images[1] : images[0],
+                  context,
+                  height: 180,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Second row with one large image
+          _buildImageItem(
+            images.length > 2 ? images[2] : images[0],
+            context,
+            height: 220,
+          ),
+
+          // Third row with remaining images if any
+          if (images.length > 3) ...[
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildImageItem(
+                    images.length > 3 ? images[3] : images[0],
+                    context,
+                    height: 150,
+                  ),
+                ),
+                if (images.length > 4) ...[
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _buildImageItem(images[4], context, height: 150),
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ],
+      );
+    }
   }
 
   Widget _buildBlogBlockRight(
@@ -683,7 +814,11 @@ class _RightImageColumnState extends State<RightImageColumn> {
     );
   }
 
-  Widget _buildImageItem(String imagePath, BuildContext context) {
+  Widget _buildImageItem(
+    String imagePath,
+    BuildContext context, {
+    double? height,
+  }) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -693,8 +828,9 @@ class _RightImageColumnState extends State<RightImageColumn> {
         child: Image.asset(
           imagePath,
           fit: BoxFit.cover,
+          height: height,
           errorBuilder: (context, error, stackTrace) => Container(
-            height: 200,
+            height: height ?? 200,
             color: Colors.purple.shade50,
             child: Icon(Icons.image, size: 50, color: Colors.purple.shade300),
           ),
