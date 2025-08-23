@@ -20,32 +20,18 @@ class LeftImageColumn extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                maxHeight: 200,
-                maxWidth: availableWidth,
+            Container(
+              width: availableWidth,
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.purple.shade50,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.purple.shade200),
               ),
-              child: Card(
-                elevation: 8,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Image.asset(
-                    'assets/page6_left.jpg',
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      height: 200,
-                      color: Colors.purple.shade50,
-                      child: Icon(
-                        Icons.image,
-                        size: 60,
-                        color: Colors.purple.shade300,
-                      ),
-                    ),
-                  ),
-                ),
+              child: Icon(
+                Icons.psychology,
+                size: 60,
+                color: Colors.purple.shade400,
               ),
             ),
             const SizedBox(height: 16),
@@ -79,8 +65,21 @@ class LeftImageColumn extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Collage-style image display
-              _buildCollageLayout(context, availableWidth),
+              // Placeholder for removed images
+              Container(
+                width: availableWidth,
+                height: 400,
+                decoration: BoxDecoration(
+                  color: Colors.purple.shade50,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.purple.shade200),
+                ),
+                child: Icon(
+                  Icons.school,
+                  size: 80,
+                  color: Colors.purple.shade300,
+                ),
+              ),
               const SizedBox(height: 16),
 
               // Text content
@@ -119,6 +118,7 @@ class LeftImageColumn extends StatelessWidget {
             ],
           ),
         );
+
       case 1: // Primary
         return SizedBox(
           width: availableWidth,
@@ -135,10 +135,24 @@ class LeftImageColumn extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
-              _buildCollageLayout(context, availableWidth),
+              Container(
+                width: availableWidth,
+                height: 200,
+                decoration: BoxDecoration(
+                  color: Colors.purple.shade50,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.purple.shade200),
+                ),
+                child: Icon(
+                  Icons.book,
+                  size: 60,
+                  color: Colors.purple.shade300,
+                ),
+              ),
             ],
           ),
         );
+
       case 2: // Pre-School
         return SizedBox(
           width: availableWidth,
@@ -146,7 +160,7 @@ class LeftImageColumn extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Pre-School Apps',
+                'Pre-School Learning',
                 style: GoogleFonts.fredoka(
                   fontSize: screenSize == ScreenSize.small ? 14 : 20,
                   fontWeight: FontWeight.bold,
@@ -155,10 +169,24 @@ class LeftImageColumn extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
-              _buildCollageLayout(context, availableWidth),
+              Container(
+                width: availableWidth,
+                height: 200,
+                decoration: BoxDecoration(
+                  color: Colors.purple.shade50,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.purple.shade200),
+                ),
+                child: Icon(
+                  Icons.child_care,
+                  size: 60,
+                  color: Colors.purple.shade300,
+                ),
+              ),
             ],
           ),
         );
+
       case 3: // 11+
         return SizedBox(
           width: availableWidth,
@@ -166,7 +194,7 @@ class LeftImageColumn extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                '11+ Apps',
+                '11+ Preparation',
                 style: GoogleFonts.fredoka(
                   fontSize: screenSize == ScreenSize.small ? 14 : 20,
                   fontWeight: FontWeight.bold,
@@ -175,10 +203,24 @@ class LeftImageColumn extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
-              _buildCollageLayout(context, availableWidth),
+              Container(
+                width: availableWidth,
+                height: 200,
+                decoration: BoxDecoration(
+                  color: Colors.purple.shade50,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.purple.shade200),
+                ),
+                child: Icon(
+                  Icons.quiz,
+                  size: 60,
+                  color: Colors.purple.shade300,
+                ),
+              ),
             ],
           ),
         );
+
       case 4: // GCSEs
         return SizedBox(
           width: availableWidth,
@@ -186,7 +228,7 @@ class LeftImageColumn extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'GCSE Apps',
+                'GCSE Studies',
                 style: GoogleFonts.fredoka(
                   fontSize: screenSize == ScreenSize.small ? 14 : 20,
                   fontWeight: FontWeight.bold,
@@ -195,40 +237,53 @@ class LeftImageColumn extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
-              _buildCollageLayout(context, availableWidth),
+              Container(
+                width: availableWidth,
+                height: 200,
+                decoration: BoxDecoration(
+                  color: Colors.purple.shade50,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.purple.shade200),
+                ),
+                child: Icon(
+                  Icons.library_books,
+                  size: 60,
+                  color: Colors.purple.shade300,
+                ),
+              ),
             ],
           ),
         );
-      case 5: // A-Levels
-        final isSmall = screenSize == ScreenSize.small;
-        final aLevelImages = [
-          'assets/page5_left1.png',
-          'assets/page5_left2.png',
-          'assets/page5_left3.png',
-          'assets/page5_left4.png',
-          'assets/page5_center1.png',
-          'assets/page5_center2.png',
-        ];
 
+      case 5: // A-Levels
         return SizedBox(
           width: availableWidth,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'A-Level Apps',
+                'A-Level Excellence',
                 style: GoogleFonts.fredoka(
-                  fontSize: isSmall ? 14 : 20,
+                  fontSize: screenSize == ScreenSize.small ? 14 : 20,
                   fontWeight: FontWeight.bold,
                   color: Colors.purple.shade800,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
-              _buildCollageLayout(
-                context,
-                availableWidth,
-                images: aLevelImages,
+              Container(
+                width: availableWidth,
+                height: 200,
+                decoration: BoxDecoration(
+                  color: Colors.purple.shade50,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.purple.shade200),
+                ),
+                child: Icon(
+                  Icons.school,
+                  size: 60,
+                  color: Colors.purple.shade300,
+                ),
               ),
             ],
           ),
@@ -241,7 +296,7 @@ class LeftImageColumn extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Our Commitment to Excellence',
+                'Educational Excellence',
                 style: GoogleFonts.fredoka(
                   fontSize: screenSize == ScreenSize.small ? 14 : 20,
                   fontWeight: FontWeight.bold,
@@ -250,130 +305,24 @@ class LeftImageColumn extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
-              _buildCollageLayout(context, availableWidth),
+              Container(
+                width: availableWidth,
+                height: 200,
+                decoration: BoxDecoration(
+                  color: Colors.purple.shade50,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.purple.shade200),
+                ),
+                child: Icon(
+                  Icons.menu_book,
+                  size: 60,
+                  color: Colors.purple.shade300,
+                ),
+              ),
             ],
           ),
         );
     }
-  }
-
-  Widget _buildCollageLayout(
-    BuildContext context,
-    double availableWidth, {
-    List<String>? images,
-  }) {
-    final screenSize = ScreenSizeUtils.getScreenSize(context);
-    final isSmall = screenSize == ScreenSize.small;
-
-    // Default images if not provided
-    final collageImages =
-        images ??
-        ['assets/page6_left.jpg', 'assets/left_2.png', 'assets/left_3.png'];
-
-    if (isSmall) {
-      // Mobile layout - grid view
-      return GridView.count(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 1,
-        children: collageImages.map((path) {
-          return _buildImageItem(path, context);
-        }).toList(),
-      );
-    } else {
-      // Desktop layout - creative collage
-      return SizedBox(
-        width: availableWidth,
-        child: Column(
-          children: [
-            // First row with one large image
-            _buildImageItem(collageImages[0], context, height: 200),
-            const SizedBox(height: 16),
-
-            // Second row with two smaller images
-            Row(
-              children: [
-                Expanded(
-                  child: _buildImageItem(
-                    collageImages.length > 1
-                        ? collageImages[1]
-                        : collageImages[0],
-                    context,
-                    height: 150,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _buildImageItem(
-                    collageImages.length > 2
-                        ? collageImages[2]
-                        : collageImages[0],
-                    context,
-                    height: 150,
-                  ),
-                ),
-              ],
-            ),
-
-            // Third row with staggered layout if more images
-            if (collageImages.length > 3) ...[
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: _buildImageItem(
-                      collageImages[3],
-                      context,
-                      height: 180,
-                    ),
-                  ),
-                  if (collageImages.length > 4) ...[
-                    const SizedBox(width: 16),
-                    Expanded(
-                      flex: 1,
-                      child: _buildImageItem(
-                        collageImages[4],
-                        context,
-                        height: 180,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ],
-          ],
-        ),
-      );
-    }
-  }
-
-  Widget _buildImageItem(
-    String imagePath,
-    BuildContext context, {
-    double? height,
-  }) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      color: Colors.purple.shade50,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Image.asset(
-          imagePath,
-          fit: BoxFit.cover,
-          height: height,
-          errorBuilder: (context, error, stackTrace) => Container(
-            height: height ?? 200,
-            color: Colors.purple.shade50,
-            child: Icon(Icons.image, size: 50, color: Colors.purple.shade300),
-          ),
-        ),
-      ),
-    );
   }
 }
 
@@ -393,7 +342,7 @@ class _RightImageColumnState extends State<RightImageColumn> {
     final screenSize = ScreenSizeUtils.getScreenSize(context);
     final availableWidth = MediaQuery.of(context).size.width * 0.25;
 
-    // Special case for AI assessment page
+    // Special case for AI assessment page - keep the robot/AI interface
     if (widget.currentPageIndex == 6) {
       return SizedBox(
         width: availableWidth,
@@ -403,7 +352,7 @@ class _RightImageColumnState extends State<RightImageColumn> {
             Stack(
               alignment: Alignment.center,
               children: [
-                // Main 3D Circle
+                // Main 3D Circle - Robot Interface
                 MouseRegion(
                   cursor: SystemMouseCursors.click,
                   child: AnimatedContainer(
@@ -429,6 +378,8 @@ class _RightImageColumnState extends State<RightImageColumn> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        Icon(Icons.android, color: Colors.white, size: 40),
+                        const SizedBox(height: 8),
                         Text(
                           'Instant',
                           style: GoogleFonts.fredoka(
@@ -473,61 +424,24 @@ class _RightImageColumnState extends State<RightImageColumn> {
       );
     }
 
-    String? rightText;
-    List<String> rightImagePaths;
+    String rightText;
 
     // Page-based content
     switch (widget.currentPageIndex) {
       case 0:
         rightText = 'Excellence in Education';
-        rightImagePaths = [
-          'assets/right_1.png',
-          'assets/right_2.png',
-          'assets/right_3.png',
-          'assets/right_4.png',
-          'assets/amazon.png',
-        ];
         break;
       case 1:
         rightText = 'Educational Resources';
-        rightImagePaths = [
-          'assets/right_1.png',
-          'assets/right_2.png',
-          'assets/right_3.png',
-          'assets/right_4.png',
-          'assets/amazon.png',
-        ];
         break;
       case 2:
         rightText = 'Pre-School Materials';
-        rightImagePaths = [
-          'assets/right_1.png',
-          'assets/right_2.png',
-          'assets/right_3.png',
-          'assets/right_4.png',
-          'assets/amazon.png',
-        ];
         break;
       case 3:
         rightText = '11+ Exam Papers';
-        rightImagePaths = [
-          'assets/page3_right1.png',
-          'assets/page3_right2.png',
-          'assets/page3_right3.png',
-          'assets/page3_right4.png',
-          'assets/page3_right5.png',
-          'assets/page3_right6.png',
-        ];
         break;
       case 4:
         rightText = 'GCSE Exam Papers';
-        rightImagePaths = [
-          'assets/page4_right1.png',
-          'assets/page4_right2.png',
-          'assets/page4_right3.png',
-          'assets/page4_right4.png',
-          'assets/amazon.png',
-        ];
         break;
       case 5:
         return SizedBox(
@@ -557,14 +471,12 @@ class _RightImageColumnState extends State<RightImageColumn> {
 
                 _buildBlogBlockRight(
                   context,
-                  image: 'assets/page5_right1.png',
                   title: 'Practice Booklets',
                   description:
                       'Complete booklets for all subjects with step-by-step solutions to help you revise effectively.',
                 ),
                 _buildBlogBlockRight(
                   context,
-                  image: 'assets/page5_right2.png',
                   title: 'Exam Technique Manuals',
                   description:
                       'Guides that teach you how to answer questions with precision, clarity, and speed.',
@@ -577,13 +489,6 @@ class _RightImageColumnState extends State<RightImageColumn> {
 
       default:
         rightText = 'Excellence in Education';
-        rightImagePaths = [
-          'assets/right_1.png',
-          'assets/right_2.png',
-          'assets/right_3.png',
-          'assets/right_4.png',
-          'assets/amazon.png',
-        ];
     }
 
     return SizedBox(
@@ -603,87 +508,23 @@ class _RightImageColumnState extends State<RightImageColumn> {
               textAlign: TextAlign.center,
             ),
           ),
-          _buildCollageLayout(context, availableWidth, images: rightImagePaths),
+          Container(
+            width: availableWidth,
+            height: 300,
+            decoration: BoxDecoration(
+              color: Colors.purple.shade50,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.purple.shade200),
+            ),
+            child: Icon(Icons.article, size: 80, color: Colors.purple.shade300),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildCollageLayout(
-    BuildContext context,
-    double availableWidth, {
-    required List<String> images,
-  }) {
-    final screenSize = ScreenSizeUtils.getScreenSize(context);
-    final isSmall = screenSize == ScreenSize.small;
-
-    if (isSmall) {
-      return GridView.count(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 1,
-        children: images.map((path) {
-          return _buildImageItem(path, context);
-        }).toList(),
-      );
-    } else {
-      return Column(
-        children: [
-          // First row with two images
-          Row(
-            children: [
-              Expanded(child: _buildImageItem(images[0], context, height: 180)),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildImageItem(
-                  images.length > 1 ? images[1] : images[0],
-                  context,
-                  height: 180,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-
-          // Second row with one large image
-          _buildImageItem(
-            images.length > 2 ? images[2] : images[0],
-            context,
-            height: 220,
-          ),
-
-          // Third row with remaining images if any
-          if (images.length > 3) ...[
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildImageItem(
-                    images.length > 3 ? images[3] : images[0],
-                    context,
-                    height: 150,
-                  ),
-                ),
-                if (images.length > 4) ...[
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _buildImageItem(images[4], context, height: 150),
-                  ),
-                ],
-              ],
-            ),
-          ],
-        ],
-      );
-    }
-  }
-
   Widget _buildBlogBlockRight(
     BuildContext context, {
-    required String image,
     required String title,
     required String description,
     bool reverse = false,
@@ -694,22 +535,14 @@ class _RightImageColumnState extends State<RightImageColumn> {
     final content = [
       Expanded(
         flex: 1,
-        child: Card(
-          elevation: 4,
-          shape: RoundedRectangleBorder(
+        child: Container(
+          height: 200,
+          decoration: BoxDecoration(
+            color: Colors.purple.shade50,
             borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.purple.shade200),
           ),
-          clipBehavior: Clip.antiAlias,
-          child: Image.asset(
-            image,
-            fit: BoxFit.cover,
-            height: 200,
-            errorBuilder: (context, error, stackTrace) => Container(
-              height: 200,
-              color: Colors.purple.shade50,
-              child: Icon(Icons.image, size: 50, color: Colors.purple.shade300),
-            ),
-          ),
+          child: Icon(Icons.menu_book, size: 50, color: Colors.purple.shade300),
         ),
       ),
       const SizedBox(width: 16),
@@ -808,31 +641,6 @@ class _RightImageColumnState extends State<RightImageColumn> {
                 ),
               ),
             ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildImageItem(
-    String imagePath,
-    BuildContext context, {
-    double? height,
-  }) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      color: Colors.purple.shade50,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Image.asset(
-          imagePath,
-          fit: BoxFit.cover,
-          height: height,
-          errorBuilder: (context, error, stackTrace) => Container(
-            height: height ?? 200,
-            color: Colors.purple.shade50,
-            child: Icon(Icons.image, size: 50, color: Colors.purple.shade300),
           ),
         ),
       ),

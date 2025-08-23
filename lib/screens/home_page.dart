@@ -3,10 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../widgets/app_bar.dart';
 import '../widgets/bottom_nav_bar.dart';
 import '../widgets/info_button.dart';
-import '../widgets/image_columns.dart';
 import '../widgets/center_content.dart';
 import '../models/page_data.dart';
-import '../models/screen_size.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,6 +20,26 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late Animation<double> _scaleAnimation;
   late Animation<double> _heightAnimation;
   int _currentPageIndex = 0;
+
+  // Map page indices to their corresponding background images
+  final Map<int, String> _backgroundImages = {
+    0: 'assets/homepage.png', // Primary/Home page
+    1: 'assets/primary.png', // Primary page
+    2: 'assets/pre_shool.png', // Pre School page
+    3: 'assets/11+.png', // 11+ page
+    4: 'assets/GCSE.png', // GCSE's page
+    5: 'assets/alevels.png', // A-Levels page
+  };
+
+  // Map for mobile-specific background images
+  final Map<int, String> _mobileBackgroundImages = {
+    0: 'assets/home_mobile.png', // Home page mobile
+    1: 'assets/primary_mobile.png', // Primary page mobile
+    2: 'assets/pre_school_mobile.png', // Pre School mobile
+    3: 'assets/11+__mobile.png', // 11+ page mobile
+    4: 'assets/GCSE_mobile.png', // GCSE's page mobile
+    5: 'assets/alevels_mobile.png', // A-Levels page mobile
+  };
 
   @override
   void initState() {
@@ -67,6 +85,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     setState(() {
       _currentPageIndex = pageIndex;
     });
+  }
+
+  // Get the background image asset path for the current page
+  String _getCurrentBackgroundImage() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth <= 768; // Mobile breakpoint
+
+    if (isMobile) {
+      return _mobileBackgroundImages[_currentPageIndex] ??
+          'assets/home_mobile.png';
+    } else {
+      return _backgroundImages[_currentPageIndex] ?? 'assets/homepage.png';
+    }
   }
 
   // Enhanced responsive calculations with NaN protection
@@ -155,59 +186,76 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           onPageChanged: _changePage,
         ),
       ),
-      body: Column(
-        children: [
-          _buildAnimatedTextBar(context),
-          Expanded(
-            child: Stack(
-              children: [
-                _buildResponsiveContent(context),
-                Positioned(
-                  bottom: ninjaBottom,
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Image.asset(
-                          'assets/ninja.png',
-                          height: ninjaSize,
-                          width: ninjaSize,
-                          errorBuilder: (context, error, stackTrace) => Icon(
-                            Icons.school,
-                            size: ninjaSize * 0.2,
-                            color: Colors.white,
+      body: Container(
+        width: double.infinity, // Expand to full width
+        height: double.infinity, // Expand to full height
+        // Dynamic background image based on current page
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(_getCurrentBackgroundImage()),
+            fit: BoxFit.cover, // Cover the entire container
+            alignment: Alignment.center,
+            filterQuality: FilterQuality.high,
+            // Remove any color filters that might reduce visibility
+          ),
+        ),
+        child: Column(
+          children: [
+            _buildAnimatedTextBar(context),
+            Expanded(
+              child: Stack(
+                children: [
+                  _buildResponsiveContent(context),
+                  Positioned(
+                    bottom: ninjaBottom,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          // Enhanced ninja image with better quality
+                          Image.asset(
+                            'assets/ninja.png',
+                            height: ninjaSize,
+                            width: ninjaSize,
+                            filterQuality: FilterQuality.high,
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) => Icon(
+                              Icons.school,
+                              size: ninjaSize * 0.2,
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                        // Enhanced responsive speech bubble
-                        _buildResponsiveSpeechBubble(context, ninjaSize),
-                        // Enhanced responsive speech bubble tail
-                        _buildResponsiveSpeechBubbleTail(context, ninjaSize),
-                      ],
+                          // Enhanced responsive speech bubble
+                          _buildResponsiveSpeechBubble(context, ninjaSize),
+                          // Enhanced responsive speech bubble tail
+                          _buildResponsiveSpeechBubbleTail(context, ninjaSize),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                Positioned(
-                  right: infoButtonRight,
-                  bottom: infoButtonBottom,
-                  child: JellyInfoButton(
-                    showInfoList: _showInfoList,
-                    animationController: _animationController,
-                    scaleAnimation: _scaleAnimation,
-                    heightAnimation: _heightAnimation,
-                    onStartAnimation: _startAnimation,
-                    onReverseAnimation: _reverseAnimation,
-                    currentPageIndex: _currentPageIndex,
-                    onPageSelected: (pageIndex) {
-                      _changePage(pageIndex);
-                    },
+                  Positioned(
+                    right: infoButtonRight,
+                    bottom: infoButtonBottom,
+                    child: JellyInfoButton(
+                      showInfoList: _showInfoList,
+                      animationController: _animationController,
+                      scaleAnimation: _scaleAnimation,
+                      heightAnimation: _heightAnimation,
+                      onStartAnimation: _startAnimation,
+                      onReverseAnimation: _reverseAnimation,
+                      currentPageIndex: _currentPageIndex,
+                      onPageSelected: (pageIndex) {
+                        _changePage(pageIndex);
+                      },
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       bottomNavigationBar: CustomBottomNavBar(
         hoveredIndex: _hoveredIndex,
@@ -285,10 +333,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
     final horizontalPadding = _getResponsiveValue(
       context: context,
-      small: 12.0,
-      medium: 16.0,
-      large: 24.0,
-      extraLarge: 32.0,
+      small: 8.0,
+      medium: 12.0,
+      large: 16.0,
+      extraLarge: 24.0,
     );
 
     // Enhanced breakpoint for layout switching
@@ -314,18 +362,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 child: Row(
                   children: PageData.pageTexts[_currentPageIndex].map((text) {
                     return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
                       child: Text(
                         text,
                         style: GoogleFonts.fredoka(
                           color: Colors.white,
                           fontSize: _getResponsiveValue(
                             context: context,
-                            small: 11.0,
-                            medium: 13.0,
-                            large: 16.0,
+                            small: 10.0,
+                            medium: 12.0,
+                            large: 14.0,
                           ),
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     );
                   }).toList(),
@@ -342,17 +391,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       color: Colors.white,
                       fontSize: _getResponsiveValue(
                         context: context,
-                        small: 18.0,
-                        medium: 20.0,
-                        large: 24.0,
-                        extraLarge: 28.0,
+                        small: 16.0,
+                        medium: 18.0,
+                        large: 20.0,
+                        extraLarge: 24.0,
                       ),
                       fontWeight: FontWeight.bold,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const Spacer(),
+                const SizedBox(width: 8),
                 Flexible(
                   flex: 3,
                   child: SingleChildScrollView(
@@ -363,7 +412,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       ) {
                         return Padding(
                           padding: EdgeInsets.symmetric(
-                            horizontal: screenWidth <= 768 ? 8.0 : 12.0,
+                            horizontal: screenWidth <= 768 ? 4.0 : 6.0,
                           ),
                           child: Text(
                             text,
@@ -371,12 +420,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               color: Colors.white,
                               fontSize: _getResponsiveValue(
                                 context: context,
-                                small: 14.0,
-                                medium: 16.0,
-                                large: 18.0,
-                                extraLarge: 20.0,
+                                small: 12.0,
+                                medium: 14.0,
+                                large: 16.0,
+                                extraLarge: 18.0,
                               ),
                             ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         );
                       }).toList(),
@@ -468,10 +518,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       children: [
         // Center content at top on mobile
         CenterContent(currentPageIndex: _currentPageIndex),
-        SizedBox(height: spacing),
-
-        // Single column for images on mobile
-        _buildMobileImageGrid(),
         SizedBox(height: bottomSpacing),
       ],
     );
@@ -482,285 +528,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       children: [
         // Center content at top
         CenterContent(currentPageIndex: _currentPageIndex),
-        SizedBox(height: spacing),
-
-        // Two-column layout for tablets
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: LeftImageColumn(currentPageIndex: _currentPageIndex),
-            ),
-            SizedBox(width: spacing),
-            Expanded(
-              child: RightImageColumn(currentPageIndex: _currentPageIndex),
-            ),
-          ],
-        ),
         SizedBox(height: bottomSpacing),
       ],
     );
   }
 
   Widget _buildDesktopLayout(double spacing, double bottomSpacing) {
-    final screenWidth = _getScreenWidth(context);
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          flex: screenWidth <= 1024 ? 2 : 3,
-          child: LeftImageColumn(currentPageIndex: _currentPageIndex),
-        ),
-        SizedBox(width: spacing),
-        Expanded(
-          flex: screenWidth <= 1024 ? 3 : 4,
-          child: CenterContent(currentPageIndex: _currentPageIndex),
-        ),
-        SizedBox(width: spacing),
-        Expanded(
-          flex: screenWidth <= 1024 ? 2 : 3,
-          child: RightImageColumn(currentPageIndex: _currentPageIndex),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMobileImageGrid() {
     return Column(
       children: [
-        // Create a responsive grid for mobile
-        _buildResponsiveImageGrid(),
+        // Center content for desktop
+        CenterContent(currentPageIndex: _currentPageIndex),
+        SizedBox(height: bottomSpacing),
       ],
-    );
-  }
-
-  Widget _buildResponsiveImageGrid() {
-    final screenWidth = _getScreenWidth(context);
-
-    // For A-levels, create a structured grid layout
-    if (_currentPageIndex == 0) {
-      // Assuming A-levels is index 0
-      return _buildALevelsGrid(screenWidth);
-    }
-
-    // Default layout for other pages
-    return Column(
-      children: [
-        LeftImageColumn(currentPageIndex: _currentPageIndex),
-        SizedBox(height: 16),
-        RightImageColumn(currentPageIndex: _currentPageIndex),
-      ],
-    );
-  }
-
-  Widget _buildALevelsGrid(double screenWidth) {
-    final crossAxisCount = screenWidth <= 480
-        ? 1
-        : screenWidth <= 768
-        ? 2
-        : 3;
-    final childAspectRatio = screenWidth <= 480 ? 1.2 : 1.0;
-
-    // Sample A-levels subjects - replace with your actual data
-    final aLevelsSubjects = [
-      {
-        'title': 'Mathematics',
-        'image': 'assets/math.png',
-        'description': 'Advanced Mathematics',
-      },
-      {
-        'title': 'Physics',
-        'image': 'assets/physics.png',
-        'description': 'Physics Fundamentals',
-      },
-      {
-        'title': 'Chemistry',
-        'image': 'assets/chemistry.png',
-        'description': 'Chemical Sciences',
-      },
-      {
-        'title': 'Biology',
-        'image': 'assets/biology.png',
-        'description': 'Life Sciences',
-      },
-      {
-        'title': 'Economics',
-        'image': 'assets/economics.png',
-        'description': 'Economic Principles',
-      },
-      {
-        'title': 'Business',
-        'image': 'assets/business.png',
-        'description': 'Business Studies',
-      },
-      {
-        'title': 'Psychology',
-        'image': 'assets/psychology.png',
-        'description': 'Human Psychology',
-      },
-      {
-        'title': 'Geography',
-        'image': 'assets/geography.png',
-        'description': 'Physical & Human Geography',
-      },
-      {
-        'title': 'History',
-        'image': 'assets/history.png',
-        'description': 'World History',
-      },
-    ];
-
-    return Column(
-      children: [
-        // Header for A-levels section
-        Padding(
-          padding: const EdgeInsets.only(bottom: 20.0),
-          child: Text(
-            'A-Level Subjects',
-            style: GoogleFonts.fredoka(
-              fontSize: _getResponsiveValue(
-                context: context,
-                small: 20.0,
-                medium: 24.0,
-                large: 28.0,
-              ),
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF002366),
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ),
-
-        // Grid layout for subjects
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossAxisCount,
-            childAspectRatio: childAspectRatio,
-            crossAxisSpacing: _getResponsiveValue(
-              context: context,
-              small: 12.0,
-              medium: 16.0,
-              large: 20.0,
-            ),
-            mainAxisSpacing: _getResponsiveValue(
-              context: context,
-              small: 12.0,
-              medium: 16.0,
-              large: 20.0,
-            ),
-          ),
-          itemCount: aLevelsSubjects.length,
-          itemBuilder: (context, index) {
-            final subject = aLevelsSubjects[index];
-            return _buildSubjectCard(subject, screenWidth);
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSubjectCard(Map<String, String> subject, double screenWidth) {
-    final cardPadding = _getResponsiveValue(
-      context: context,
-      small: 12.0,
-      medium: 16.0,
-      large: 20.0,
-    );
-
-    final imageSize = _getResponsiveValue(
-      context: context,
-      small: 60.0,
-      medium: 70.0,
-      large: 80.0,
-    );
-
-    final titleFontSize = _getResponsiveValue(
-      context: context,
-      small: 14.0,
-      medium: 16.0,
-      large: 18.0,
-    );
-
-    final descriptionFontSize = _getResponsiveValue(
-      context: context,
-      small: 11.0,
-      medium: 12.0,
-      large: 14.0,
-    );
-
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Container(
-        padding: EdgeInsets.all(cardPadding),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Colors.white, Colors.grey.shade50],
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Subject image
-            Container(
-              height: imageSize,
-              width: imageSize,
-              decoration: BoxDecoration(
-                color: const Color(0xFF002366).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Image.asset(
-                subject['image']!,
-                height: imageSize * 0.7,
-                width: imageSize * 0.7,
-                errorBuilder: (context, error, stackTrace) => Icon(
-                  Icons.book,
-                  size: imageSize * 0.6,
-                  color: const Color(0xFF002366),
-                ),
-              ),
-            ),
-
-            SizedBox(height: cardPadding * 0.5),
-
-            // Subject title
-            Text(
-              subject['title']!,
-              style: GoogleFonts.fredoka(
-                fontSize: titleFontSize,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF002366),
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-
-            if (screenWidth > 480) ...[
-              SizedBox(height: cardPadding * 0.25),
-
-              // Subject description (only on larger screens)
-              Text(
-                subject['description']!,
-                style: GoogleFonts.fredoka(
-                  fontSize: descriptionFontSize,
-                  color: Colors.grey.shade600,
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ],
-        ),
-      ),
     );
   }
 }
