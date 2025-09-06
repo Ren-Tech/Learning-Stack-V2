@@ -100,6 +100,30 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
   }
 
+  // Get the appropriate background image scale based on screen size
+  double _getBackgroundImageScale() {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // Keep original size on mobile (scale 1.0)
+    if (screenWidth <= 768) {
+      return 1.0;
+    }
+
+    // For larger screens, scale down based on screen width
+    if (screenWidth <= 1024) {
+      return 0.9;
+    }
+    if (screenWidth <= 1200) {
+      return 0.85;
+    }
+    if (screenWidth <= 1400) {
+      return 0.8;
+    }
+
+    // For very large screens
+    return 0.75;
+  }
+
   // Enhanced responsive calculations with NaN protection
   double _getResponsiveValue({
     required BuildContext context,
@@ -150,6 +174,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final screenWidth = _getScreenWidth(context);
     final screenHeight = _getScreenHeight(context);
+    final isMobile = screenWidth <= 768;
 
     // More granular responsive sizing
     final ninjaSize = _getResponsiveValue(
@@ -186,76 +211,114 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           onPageChanged: _changePage,
         ),
       ),
-      body: Container(
-        width: double.infinity, // Expand to full width
-        height: double.infinity, // Expand to full height
-        // Dynamic background image based on current page
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(_getCurrentBackgroundImage()),
-            fit: BoxFit.cover, // Cover the entire container
-            alignment: Alignment.center,
-            filterQuality: FilterQuality.high,
-            // Remove any color filters that might reduce visibility
-          ),
-        ),
-        child: Column(
-          children: [
-            _buildAnimatedTextBar(context),
-            Expanded(
-              child: Stack(
-                children: [
-                  _buildResponsiveContent(context),
-                  Positioned(
-                    bottom: ninjaBottom,
-                    left: 0,
-                    right: 0,
-                    child: Center(
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          // Enhanced ninja image with better quality
-                          Image.asset(
-                            'assets/ninja.png',
-                            height: ninjaSize,
-                            width: ninjaSize,
-                            filterQuality: FilterQuality.high,
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) => Icon(
-                              Icons.school,
-                              size: ninjaSize * 0.2,
-                              color: Colors.white,
-                            ),
-                          ),
-                          // Enhanced responsive speech bubble
-                          _buildResponsiveSpeechBubble(context, ninjaSize),
-                          // Enhanced responsive speech bubble tail
-                          _buildResponsiveSpeechBubbleTail(context, ninjaSize),
-                        ],
+      body: Stack(
+        children: [
+          // Background image with conditional scaling
+          isMobile
+              ? Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage(_getCurrentBackgroundImage()),
+                      fit: BoxFit.cover, // Use cover on mobile
+                      alignment: Alignment.center,
+                      filterQuality: FilterQuality.high,
+                    ),
+                  ),
+                )
+              : Transform.scale(
+                  scale:
+                      _getBackgroundImageScale(), // Scale down on larger screens
+                  child: Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage(_getCurrentBackgroundImage()),
+                        fit: BoxFit.cover,
+                        alignment: Alignment.center,
+                        filterQuality: FilterQuality.high,
                       ),
                     ),
                   ),
-                  Positioned(
-                    right: infoButtonRight,
-                    bottom: infoButtonBottom,
-                    child: JellyInfoButton(
-                      showInfoList: _showInfoList,
-                      animationController: _animationController,
-                      scaleAnimation: _scaleAnimation,
-                      heightAnimation: _heightAnimation,
-                      onStartAnimation: _startAnimation,
-                      onReverseAnimation: _reverseAnimation,
-                      currentPageIndex: _currentPageIndex,
-                      onPageSelected: (pageIndex) {
-                        _changePage(pageIndex);
-                      },
-                    ),
-                  ),
+                ),
+          // Content overlay with gradient for better text visibility
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.transparent,
+                  Colors.black.withOpacity(isMobile ? 0.2 : 0.3),
                 ],
+                stops: const [0.5, 1.0],
               ),
             ),
-          ],
-        ),
+            child: Column(
+              children: [
+                _buildAnimatedTextBar(context),
+                Expanded(
+                  child: Stack(
+                    children: [
+                      _buildResponsiveContent(context),
+                      Positioned(
+                        bottom: ninjaBottom,
+                        left: 0,
+                        right: 0,
+                        child: Center(
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              // Enhanced ninja image with better quality
+                              Image.asset(
+                                'assets/ninja.png',
+                                height: ninjaSize,
+                                width: ninjaSize,
+                                filterQuality: FilterQuality.high,
+                                fit: BoxFit.contain,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Icon(
+                                      Icons.school,
+                                      size: ninjaSize * 0.2,
+                                      color: Colors.white,
+                                    ),
+                              ),
+                              // Enhanced responsive speech bubble
+                              _buildResponsiveSpeechBubble(context, ninjaSize),
+                              // Enhanced responsive speech bubble tail
+                              _buildResponsiveSpeechBubbleTail(
+                                context,
+                                ninjaSize,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        right: infoButtonRight,
+                        bottom: infoButtonBottom,
+                        child: JellyInfoButton(
+                          showInfoList: _showInfoList,
+                          animationController: _animationController,
+                          scaleAnimation: _scaleAnimation,
+                          heightAnimation: _heightAnimation,
+                          onStartAnimation: _startAnimation,
+                          onReverseAnimation: _reverseAnimation,
+                          currentPageIndex: _currentPageIndex,
+                          onPageSelected: (pageIndex) {
+                            _changePage(pageIndex);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: CustomBottomNavBar(
         hoveredIndex: _hoveredIndex,
