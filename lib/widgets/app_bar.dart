@@ -61,19 +61,17 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  // Calculate the approximate width needed for navigation items
   double _calculateNavItemsWidth(BuildContext context) {
     final screenSize = ScreenSizeUtils.getScreenSize(context);
     final horizontalPadding = screenSize == ScreenSize.small ? 12.0 : 24.0;
     final horizontalMargin = screenSize == ScreenSize.small ? 4.0 : 8.0;
 
-    // Approximate character width based on font size
     final fontSize = screenSize == ScreenSize.small
         ? 12.0
         : screenSize == ScreenSize.medium
         ? 14.0
         : 16.0;
-    final charWidth = fontSize * 0.6; // Rough estimation
+    final charWidth = fontSize * 0.6;
 
     double totalWidth = 0;
     final navItems = [
@@ -93,18 +91,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return totalWidth;
   }
 
-  // Calculate if search field should be shown
   bool _shouldShowSearchField(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
 
-    if (screenWidth <= 900) return false; // Already handled by hamburger menu
+    if (screenWidth <= 900) return false;
 
-    // Calculate space used by other elements
-    final logoAndTitleWidth = 300.0; // Approximate width for logo + title
-    final rightImageWidth = 64.0; // Right image + padding
+    final logoAndTitleWidth = 300.0;
+    final rightImageWidth = 64.0;
     final navItemsWidth = _calculateNavItemsWidth(context);
-    final minSearchFieldWidth = 150.0; // Minimum width for search field
-    final padding = 32.0; // General padding and margins
+    final minSearchFieldWidth = 150.0;
+    final padding = 32.0;
 
     final usedSpace =
         logoAndTitleWidth + rightImageWidth + navItemsWidth + padding;
@@ -122,6 +118,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     if (screenSize == ScreenSize.small) {
       return AppBar(
         backgroundColor: const Color.fromARGB(255, 13, 76, 128),
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -188,6 +186,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     return AppBar(
       backgroundColor: const Color.fromARGB(255, 13, 76, 128),
+      elevation: 0,
+      surfaceTintColor: Colors.transparent,
       title: Flexible(
         child: GestureDetector(
           onTap: () => onPageChanged(0),
@@ -221,12 +221,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       actions: [
-        // Navigation Items with flexible sizing
         if (screenWidth > 900)
           Flexible(
-            flex: showSearchField
-                ? 3
-                : 4, // Give more space when search is hidden
+            flex: showSearchField ? 3 : 4,
             child: Container(
               constraints: BoxConstraints(
                 maxWidth: showSearchField
@@ -247,8 +244,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
             ),
           ),
-
-        // Search Field - only show if there's enough space
         if (screenWidth > 900 && showSearchField)
           Flexible(
             flex: 1,
@@ -281,8 +276,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
             ),
           ),
-
-        // Search icon button - show when search field is hidden but screen is wide enough
         if (screenWidth > 900 && !showSearchField)
           IconButton(
             icon: const Icon(Icons.search, color: Colors.white),
@@ -293,8 +286,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               );
             },
           ),
-
-        // Right side image with responsive sizing
         if (screenWidth > 600)
           Padding(
             padding: const EdgeInsets.only(right: 16.0, left: 8.0),
@@ -304,8 +295,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               width: 40,
             ),
           ),
-
-        // Hamburger menu for smaller screens
         if (screenWidth <= 900)
           PopupMenuButton<int>(
             icon: const Icon(Icons.menu, color: Colors.white),
