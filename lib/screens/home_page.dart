@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:learning_stack_v2/widgets/expandle_info.dart';
 import '../widgets/app_bar.dart';
 import '../widgets/bottom_nav_bar.dart';
 import '../widgets/info_button.dart';
@@ -23,7 +24,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   // Map page indices to their corresponding background images
   final Map<int, String> _backgroundImages = {
-    0: 'assets/homepage.png', // Primary/Home page
+    0: 'assets/home.png', // Primary/Home page
     1: 'assets/primary.png', // Primary page
     2: 'assets/pre_shool.png', // Pre School page
     3: 'assets/11+.png', // 11+ page
@@ -33,7 +34,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   // Map for mobile-specific background images
   final Map<int, String> _mobileBackgroundImages = {
-    0: 'assets/home_mobile.png', // Home page mobile
+    0: 'assets/hm.png', // Home page mobile
     1: 'assets/primary_mobile.png', // Primary page mobile
     2: 'assets/pre_school_mobile.png', // Pre School mobile
     3: 'assets/11+__mobile.png', // 11+ page mobile
@@ -193,12 +194,22 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       extraLarge: -120.0,
     );
 
+    // Adjusted positioning for ninja image - moved more to the left
+    final ninjaLeft = _getResponsiveValue(
+      context: context,
+      small: screenWidth * 0.1, // 10% from left on mobile
+      medium: screenWidth * 0.15, // 15% from left on medium screens
+      large: screenWidth * 0.2, // 20% from left on large screens
+      extraLarge: screenWidth * 0.25, // 25% from left on extra large
+    );
+
+    // Adjusted positioning for info button - moved more to the left
     final infoButtonRight = _getResponsiveValue(
       context: context,
-      small: 16.0,
-      medium: screenWidth * 0.08,
-      large: screenWidth * 0.06,
-      extraLarge: 90.0,
+      small: 30.0, // Reduced from 16.0
+      medium: screenWidth * 0.05, // Reduced from 0.08
+      large: screenWidth * 0.04, // Reduced from 0.06
+      extraLarge: 60.0, // Reduced from 90.0
     );
 
     final infoButtonBottom = screenWidth <= 480 ? 16.0 : 0.0;
@@ -263,39 +274,27 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   child: Stack(
                     children: [
                       _buildResponsiveContent(context),
+                      // Ninja image positioned at center bottom
                       Positioned(
                         bottom: ninjaBottom,
                         left: 0,
                         right: 0,
                         child: Center(
-                          child: Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              // Enhanced ninja image with better quality
-                              Image.asset(
-                                'assets/ninja.png',
-                                height: ninjaSize,
-                                width: ninjaSize,
-                                filterQuality: FilterQuality.high,
-                                fit: BoxFit.contain,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    Icon(
-                                      Icons.school,
-                                      size: ninjaSize * 0.2,
-                                      color: Colors.white,
-                                    ),
-                              ),
-                              // Enhanced responsive speech bubble
-                              _buildResponsiveSpeechBubble(context, ninjaSize),
-                              // Enhanced responsive speech bubble tail
-                              _buildResponsiveSpeechBubbleTail(
-                                context,
-                                ninjaSize,
-                              ),
-                            ],
+                          child: Image.asset(
+                            'assets/ninja.png',
+                            height: ninjaSize,
+                            width: ninjaSize,
+                            filterQuality: FilterQuality.high,
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) => Icon(
+                              Icons.school,
+                              size: ninjaSize * 0.2,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),
+                      // Existing jelly info button
                       Positioned(
                         right: infoButtonRight,
                         bottom: infoButtonBottom,
@@ -312,6 +311,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           },
                         ),
                       ),
+                      // NEW: Only show ExpandableInfoButton on HomePage (index 0)
+                      if (_currentPageIndex == 0) ExpandableInfoButton(),
                     ],
                   ),
                 ),
@@ -324,62 +325,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         hoveredIndex: _hoveredIndex,
         onHover: (index) => setState(() => _hoveredIndex = index),
       ),
-    );
-  }
-
-  Widget _buildResponsiveSpeechBubble(BuildContext context, double ninjaSize) {
-    final screenWidth = _getScreenWidth(context);
-
-    // Adaptive positioning based on screen size and ninja size
-    final bubbleRight = screenWidth <= 480
-        ? -80.0
-        : screenWidth <= 768
-        ? -100.0
-        : -120.0;
-
-    final bubbleTop = ninjaSize < 200
-        ? 30.0
-        : ninjaSize < 280
-        ? 40.0
-        : 45.0;
-
-    return Positioned(
-      right: bubbleRight,
-      top: bubbleTop,
-      child: SpeechBubble(
-        text: 'Our knowledge\nteam are always ready\nto help!',
-        screenWidth: screenWidth,
-      ),
-    );
-  }
-
-  Widget _buildResponsiveSpeechBubbleTail(
-    BuildContext context,
-    double ninjaSize,
-  ) {
-    final screenWidth = _getScreenWidth(context);
-
-    final tailRight = screenWidth <= 480
-        ? -30.0
-        : screenWidth <= 768
-        ? -35.0
-        : -40.0;
-
-    final tailTop = ninjaSize < 200
-        ? 50.0
-        : ninjaSize < 280
-        ? 60.0
-        : 65.0;
-
-    final tailSize = Size(
-      screenWidth <= 480 ? 25.0 : 30.0,
-      screenWidth <= 480 ? 15.0 : 20.0,
-    );
-
-    return Positioned(
-      right: tailRight,
-      top: tailTop,
-      child: CustomPaint(size: tailSize, painter: _SpeechBubbleTailPainter()),
     );
   }
 
@@ -605,100 +550,4 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ],
     );
   }
-}
-
-class _SpeechBubbleTailPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
-
-    final path = Path();
-    path.moveTo(0, size.height / 2);
-    path.lineTo(size.width, 0);
-    path.lineTo(size.width, size.height);
-    path.close();
-
-    canvas.drawPath(path, paint);
-    canvas.drawShadow(path, Colors.black.withOpacity(0.1), 2, false);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-class SpeechBubble extends StatelessWidget {
-  final String text;
-  final double screenWidth;
-
-  const SpeechBubble({
-    super.key,
-    required this.text,
-    required this.screenWidth,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    // Responsive font size for speech bubble
-    final fontSize = screenWidth <= 480
-        ? 12.0
-        : screenWidth <= 768
-        ? 13.0
-        : 14.0;
-
-    // Responsive padding
-    final padding = screenWidth <= 480 ? 10.0 : 12.0;
-
-    return CustomPaint(
-      painter: BubblePainter(),
-      child: Padding(
-        padding: EdgeInsets.all(padding),
-        child: Text(
-          text,
-          textAlign: TextAlign.center,
-          style: GoogleFonts.fredoka(
-            fontSize: fontSize,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFF002366), // Dark blue
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class BubblePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
-
-    final border = Paint()
-      ..color = const Color(0xFF002366)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-
-    final rrect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(0, 0, size.width, size.height - 10),
-      const Radius.circular(12),
-    );
-
-    // Draw bubble
-    canvas.drawRRect(rrect, paint);
-    canvas.drawRRect(rrect, border);
-
-    // Draw tail
-    final path = Path();
-    path.moveTo(size.width / 2 - 10, size.height - 10);
-    path.lineTo(size.width / 2, size.height);
-    path.lineTo(size.width / 2 + 10, size.height - 10);
-    path.close();
-    canvas.drawPath(path, paint);
-    canvas.drawPath(path, border);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }

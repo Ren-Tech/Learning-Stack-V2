@@ -10,7 +10,7 @@ class JellyInfoButton extends StatelessWidget {
   final VoidCallback onStartAnimation;
   final VoidCallback onReverseAnimation;
   final Function(int) onPageSelected;
-  final int currentPageIndex; // Add this parameter
+  final int currentPageIndex;
 
   const JellyInfoButton({
     super.key,
@@ -21,22 +21,22 @@ class JellyInfoButton extends StatelessWidget {
     required this.onStartAnimation,
     required this.onReverseAnimation,
     required this.onPageSelected,
-    required this.currentPageIndex, // Add this to constructor
+    required this.currentPageIndex,
   });
 
   @override
   Widget build(BuildContext context) {
     final screenSize = ScreenSizeUtils.getScreenSize(context);
     final buttonSize = screenSize == ScreenSize.small
-        ? 40.0
+        ? 80.0 // Increased from 60.0
         : screenSize == ScreenSize.medium
-        ? 50.0
-        : 60.0;
+        ? 100.0 // Increased from 70.0
+        : 120.0; // Increased from 80.0
     final infoButtonWidth = screenSize == ScreenSize.small
-        ? 70.0
+        ? 90.0 // Increased from 70.0
         : screenSize == ScreenSize.medium
-        ? 90.0
-        : 110.0;
+        ? 110.0 // Increased from 90.0
+        : 130.0; // Increased from 110.0
 
     final options = [
       {'text': 'Primary', 'pageIndex': 1},
@@ -63,94 +63,11 @@ class JellyInfoButton extends StatelessWidget {
                   transform: Matrix4.identity()
                     ..translate(0.0, showInfoList ? -15.0 : 0.0)
                     ..scale(showInfoList ? 1.3 : 1.0),
-                  child: Container(
-                    width: buttonSize,
-                    height: buttonSize,
-                    margin: const EdgeInsets.only(bottom: 8),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.purple.withOpacity(0.4),
-                          blurRadius: showInfoList ? 15 : 8,
-                          spreadRadius: showInfoList ? 3 : 1.5,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        GestureDetector(
-                          onTap: () {},
-                          child: MouseRegion(
-                            cursor: SystemMouseCursors.click,
-                            child: Image.asset(
-                              'assets/little_robot.png',
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  Icon(
-                                    Icons.help_outline,
-                                    color: Colors.purple.shade700,
-                                    size: buttonSize * 0.6,
-                                  ),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          right: -90,
-                          top: -10,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  "I'm kAI",
-                                  style: GoogleFonts.fredoka(
-                                    fontSize: screenSize == ScreenSize.small
-                                        ? 12
-                                        : 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.purple.shade800,
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                Icon(
-                                  Icons.auto_awesome,
-                                  color: Colors.amber,
-                                  size: screenSize == ScreenSize.small
-                                      ? 14
-                                      : 16,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          right: -40,
-                          top: 10,
-                          child: CustomPaint(
-                            size: const Size(30, 20),
-                            painter: _SpeechBubbleTailPainter(),
-                          ),
-                        ),
-                      ],
+                  child: GestureDetector(
+                    onTap: () {},
+                    child: MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: _buildHighQualityImage(buttonSize),
                     ),
                   ),
                 ),
@@ -380,6 +297,21 @@ class JellyInfoButton extends StatelessWidget {
     );
   }
 
+  Widget _buildHighQualityImage(double size) {
+    // Use a high-resolution source image (at least 2x the display size)
+    // For web: Consider using a WebP format for better compression
+    return Image.asset(
+      'assets/bot.png', // Replace with a high-resolution version
+      width: 120,
+      height: 120,
+      filterQuality: FilterQuality.high, // Use high filter quality
+      isAntiAlias: true, // Enable anti-aliasing
+      fit: BoxFit.contain, // Maintain aspect ratio
+      errorBuilder: (context, error, stackTrace) =>
+          Icon(Icons.help_outline, color: Colors.purple.shade700),
+    );
+  }
+
   IconData _getIconForOption(String option) {
     switch (option) {
       case 'Primary':
@@ -396,25 +328,4 @@ class JellyInfoButton extends StatelessWidget {
         return Icons.help_outline;
     }
   }
-}
-
-class _SpeechBubbleTailPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
-
-    final path = Path();
-    path.moveTo(0, size.height / 2);
-    path.lineTo(size.width, 0);
-    path.lineTo(size.width, size.height);
-    path.close();
-
-    canvas.drawPath(path, paint);
-    canvas.drawShadow(path, Colors.black.withOpacity(0.1), 2, false);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
