@@ -321,19 +321,25 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   },
                 ),
               ),
-              // UPDATED: ExpandableInfoButton with conditional centering
+              // UPDATED: ExpandableInfoButton with conditional centering and navigation
               if (_currentPageIndex == 0)
                 shouldCenterExpandableInfo
                     ? // Centered positioning for mobile/portrait
-                      const Positioned(
+                      Positioned(
                         top: 0,
                         left: 0,
                         right: 0,
                         bottom: 0,
-                        child: Center(child: ExpandableInfoButton()),
+                        child: Center(
+                          child: ExpandableInfoButton(onNavigate: _changePage),
+                        ),
                       )
-                    : // Default positioning for desktop/landscape
-                      const Positioned(child: ExpandableInfoButton()),
+                    : // Positioned for desktop/landscape with proper positioning
+                      Positioned(
+                        top: 50.0,
+                        right: screenWidth * 0.15,
+                        child: ExpandableInfoButton(onNavigate: _changePage),
+                      ),
             ],
           ),
         ),
