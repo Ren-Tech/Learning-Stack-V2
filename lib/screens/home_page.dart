@@ -180,12 +180,22 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return screenWidth <= 768 || orientation == Orientation.portrait;
   }
 
+  // Helper method to determine if we should center the ExpandableInfoButton
+  bool _shouldCenterExpandableInfo() {
+    final screenWidth = _getScreenWidth(context);
+    final orientation = MediaQuery.of(context).orientation;
+
+    // Center on mobile screens OR in portrait mode
+    return screenWidth <= 768 || orientation == Orientation.portrait;
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = _getScreenWidth(context);
     final screenHeight = _getScreenHeight(context);
     final isMobile = screenWidth <= 768;
     final shouldEnableScrolling = _shouldEnableScrolling();
+    final shouldCenterExpandableInfo = _shouldCenterExpandableInfo();
 
     // More granular responsive sizing
     final ninjaSize = _getResponsiveValue(
@@ -311,8 +321,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   },
                 ),
               ),
-              // NEW: Only show ExpandableInfoButton on HomePage (index 0)
-              if (_currentPageIndex == 0) ExpandableInfoButton(),
+              // UPDATED: ExpandableInfoButton with conditional centering
+              if (_currentPageIndex == 0)
+                shouldCenterExpandableInfo
+                    ? // Centered positioning for mobile/portrait
+                      const Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        child: Center(child: ExpandableInfoButton()),
+                      )
+                    : // Default positioning for desktop/landscape
+                      const Positioned(child: ExpandableInfoButton()),
             ],
           ),
         ),
