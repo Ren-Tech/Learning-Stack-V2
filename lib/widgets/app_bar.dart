@@ -51,12 +51,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           child: Text(
             label,
             style: TextStyle(
-              // FIX 1: Use TextStyle instead of GoogleFonts for production stability
-              fontFamily: 'Fredoka', // Make sure this is in pubspec.yaml
-              color: Colors.white, // Force solid white for all states
+              fontFamily: 'Fredoka',
+              color: Colors.white,
               fontSize: fontSize,
               fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
-              // FIX 2: Add text shadow for better visibility
               shadows: [
                 Shadow(
                   offset: const Offset(0, 1),
@@ -110,13 +108,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             label,
             style:
                 GoogleFonts.fredoka(
-                  color: const Color(0xFFFFFFFF), // Use explicit hex color
+                  color: const Color(0xFFFFFFFF),
                   fontSize: fontSize,
                   fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
-                  // FIX 3: Add fallback font
-                  // fontFamilyFallback removed: not supported by GoogleFonts.fredoka
                 ).copyWith(
-                  // FIX 4: Force color override
                   color: const Color(0xFFFFFFFF),
                   shadows: [
                     Shadow(
@@ -132,20 +127,29 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
+  // Helper method to check if we should use scrolling behavior
+  bool _shouldUseScrolling(BuildContext context) {
+    final screenSize = ScreenSizeUtils.getScreenSize(context);
+    final orientation = MediaQuery.of(context).orientation;
+
+    // Use scrolling for small screens OR portrait orientation
+    return screenSize == ScreenSize.small ||
+        orientation == Orientation.portrait;
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenSize = ScreenSizeUtils.getScreenSize(context);
     final screenWidth = MediaQuery.of(context).size.width;
+    final orientation = MediaQuery.of(context).orientation;
 
-    // FIX 5: Simplified logic for production
-    final showSearchField = screenWidth > 1200; // More conservative threshold
+    final showSearchField = screenWidth > 1200;
+    final shouldUseScrolling = _shouldUseScrolling(context);
 
     if (screenSize == ScreenSize.small) {
       return AppBar(
-        backgroundColor: const Color(
-          0xFF0D4C80,
-        ), // Use hex colors for consistency
-        elevation: 0, // FIX 6: Remove elevation issues
+        backgroundColor: const Color(0xFF0D4C80),
+        elevation: 0,
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -250,57 +254,122 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       actions: [
-        // Navigation Items
+        // Navigation Items with horizontal scrolling when needed
         if (screenWidth > 900)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Use the fallback method for production stability
-                buildLevelLabelWithFallback('Home', 0, context),
-                buildLevelLabelWithFallback('Primary', 1, context),
-                buildLevelLabelWithFallback('Pre-School', 2, context),
-                buildLevelLabelWithFallback('11+', 3, context),
-                buildLevelLabelWithFallback('GCSEs', 4, context),
-                buildLevelLabelWithFallback('A-Levels', 5, context),
-              ],
-            ),
+            child: shouldUseScrolling
+                ? SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        buildLevelLabelWithFallback('Home', 0, context),
+                        buildLevelLabelWithFallback('Primary', 1, context),
+                        buildLevelLabelWithFallback('Pre-School', 2, context),
+                        buildLevelLabelWithFallback('11+', 3, context),
+                        buildLevelLabelWithFallback('GCSEs', 4, context),
+                        buildLevelLabelWithFallback('A-Levels', 5, context),
+                      ],
+                    ),
+                  )
+                : Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      buildLevelLabelWithFallback('Home', 0, context),
+                      buildLevelLabelWithFallback('Primary', 1, context),
+                      buildLevelLabelWithFallback('Pre-School', 2, context),
+                      buildLevelLabelWithFallback('11+', 3, context),
+                      buildLevelLabelWithFallback('GCSEs', 4, context),
+                      buildLevelLabelWithFallback('A-Levels', 5, context),
+                    ],
+                  ),
           ),
 
-        // Search Field
+        // Search Field with scrolling when needed
         if (screenWidth > 1200 && showSearchField)
-          Container(
-            width: 200,
-            margin: const EdgeInsets.symmetric(horizontal: 8),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Search...',
-                hintStyle: const TextStyle(
-                  color: Color(0xB3FFFFFF), // 70% opacity white
-                  fontFamily: 'Fredoka',
+          shouldUseScrolling
+              ? SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Container(
+                    width: 200,
+                    margin: const EdgeInsets.symmetric(horizontal: 8),
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Search...',
+                        hintStyle: const TextStyle(
+                          color: Color(0xB3FFFFFF),
+                          fontFamily: 'Fredoka',
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: const Color(0x33FFFFFF),
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          color: Color(0xFFFFFFFF),
+                        ),
+                        suffixIcon: screenWidth > 1400
+                            ? IconButton(
+                                icon: const Icon(
+                                  Icons.mic,
+                                  color: Color(0xFFFFFFFF),
+                                ),
+                                onPressed: () {},
+                              )
+                            : null,
+                      ),
+                      style: const TextStyle(
+                        color: Color(0xFFFFFFFF),
+                        fontFamily: 'Fredoka',
+                      ),
+                    ),
+                  ),
+                )
+              : Container(
+                  width: 200,
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Search...',
+                      hintStyle: const TextStyle(
+                        color: Color(0xB3FFFFFF),
+                        fontFamily: 'Fredoka',
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25),
+                        borderSide: BorderSide.none,
+                      ),
+                      filled: true,
+                      fillColor: const Color(0x33FFFFFF),
+                      prefixIcon: const Icon(
+                        Icons.search,
+                        color: Color(0xFFFFFFFF),
+                      ),
+                      suffixIcon: screenWidth > 1400
+                          ? IconButton(
+                              icon: const Icon(
+                                Icons.mic,
+                                color: Color(0xFFFFFFFF),
+                              ),
+                              onPressed: () {},
+                            )
+                          : null,
+                    ),
+                    style: const TextStyle(
+                      color: Color(0xFFFFFFFF),
+                      fontFamily: 'Fredoka',
+                    ),
+                  ),
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(25),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: const Color(0x33FFFFFF), // 20% opacity white
-                prefixIcon: const Icon(Icons.search, color: Color(0xFFFFFFFF)),
-                suffixIcon: screenWidth > 1400
-                    ? IconButton(
-                        icon: const Icon(Icons.mic, color: Color(0xFFFFFFFF)),
-                        onPressed: () {},
-                      )
-                    : null,
-              ),
-              style: const TextStyle(
-                color: Color(0xFFFFFFFF),
-                fontFamily: 'Fredoka',
-              ),
-            ),
-          ),
 
         // Search icon button
         if (screenWidth > 900 && !showSearchField)
@@ -325,8 +394,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
 
-        // Hamburger menu for smaller screens
-        if (screenWidth <= 900)
+        // Hamburger menu for smaller screens or when scrolling is needed
+        if (screenWidth <= 900 || shouldUseScrolling)
           PopupMenuButton<int>(
             icon: const Icon(Icons.menu, color: Color(0xFFFFFFFF)),
             onSelected: (value) => onPageChanged(value),

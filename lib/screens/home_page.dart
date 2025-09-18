@@ -171,11 +171,21 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         : 568.0; // Fallback to minimum mobile height
   }
 
+  // Helper method to determine if we should enable scrolling
+  bool _shouldEnableScrolling() {
+    final screenWidth = _getScreenWidth(context);
+    final orientation = MediaQuery.of(context).orientation;
+
+    // Enable scrolling on small screens (mobile) OR in portrait mode
+    return screenWidth <= 768 || orientation == Orientation.portrait;
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = _getScreenWidth(context);
     final screenHeight = _getScreenHeight(context);
     final isMobile = screenWidth <= 768;
+    final shouldEnableScrolling = _shouldEnableScrolling();
 
     // More granular responsive sizing
     final ninjaSize = _getResponsiveValue(
@@ -214,135 +224,159 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
     final infoButtonBottom = screenWidth <= 480 ? 16.0 : 0.0;
 
-    // Position for ExpandableInfoButton on mobile
-    final expandableButtonBottom = isMobile
-        ? screenHeight *
-              0.15 // Position higher on mobile to avoid overlap
-        : 0.0;
-
-    final expandableButtonRight = isMobile
-        ? screenWidth *
-              0.05 // Position from right edge on mobile
-        : 0.0;
-
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(kToolbarHeight),
-        child: CustomAppBar(
-          currentPageIndex: _currentPageIndex,
-          onPageChanged: _changePage,
-        ),
-      ),
-      body: Stack(
-        children: [
-          // Background image with conditional scaling
-          isMobile
-              ? Container(
+    // Main content widget
+    Widget mainContent = Stack(
+      children: [
+        // Background image with conditional scaling
+        isMobile
+            ? Container(
+                width: double.infinity,
+                height: screenHeight,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage(_getCurrentBackgroundImage()),
+                    fit: BoxFit.cover, // Use cover on mobile
+                    alignment: Alignment.center,
+                    filterQuality: FilterQuality.high,
+                  ),
+                ),
+              )
+            : Transform.scale(
+                scale:
+                    _getBackgroundImageScale(), // Scale down on larger screens
+                child: Container(
                   width: double.infinity,
-                  height: double.infinity,
+                  height: screenHeight,
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       image: AssetImage(_getCurrentBackgroundImage()),
-                      fit: BoxFit.cover, // Use cover on mobile
+                      fit: BoxFit.cover,
                       alignment: Alignment.center,
                       filterQuality: FilterQuality.high,
                     ),
                   ),
-                )
-              : Transform.scale(
-                  scale:
-                      _getBackgroundImageScale(), // Scale down on larger screens
-                  child: Container(
-                    width: double.infinity,
-                    height: double.infinity,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage(_getCurrentBackgroundImage()),
-                        fit: BoxFit.cover,
-                        alignment: Alignment.center,
-                        filterQuality: FilterQuality.high,
-                      ),
+                ),
+              ),
+        // Content overlay with gradient for better text visibility
+        Container(
+          height: screenHeight,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.transparent,
+                Colors.black.withOpacity(isMobile ? 0.2 : 0.3),
+              ],
+              stops: const [0.5, 1.0],
+            ),
+          ),
+          child: Stack(
+            children: [
+              _buildResponsiveContent(context),
+              // Ninja image positioned at center bottom
+              Positioned(
+                bottom: ninjaBottom,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: Image.asset(
+                    'assets/ninja.png',
+                    height: ninjaSize,
+                    width: ninjaSize,
+                    filterQuality: FilterQuality.high,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) => Icon(
+                      Icons.school,
+                      size: ninjaSize * 0.2,
+                      color: Colors.white,
                     ),
                   ),
                 ),
-          // Content overlay with gradient for better text visibility
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.transparent,
-                  Colors.black.withOpacity(isMobile ? 0.2 : 0.3),
-                ],
-                stops: const [0.5, 1.0],
+              ),
+              // Existing jelly info button
+              Positioned(
+                right: infoButtonRight,
+                bottom: infoButtonBottom,
+                child: JellyInfoButton(
+                  showInfoList: _showInfoList,
+                  animationController: _animationController,
+                  scaleAnimation: _scaleAnimation,
+                  heightAnimation: _heightAnimation,
+                  onStartAnimation: _startAnimation,
+                  onReverseAnimation: _reverseAnimation,
+                  currentPageIndex: _currentPageIndex,
+                  onPageSelected: (pageIndex) {
+                    _changePage(pageIndex);
+                  },
+                ),
+              ),
+              // NEW: Only show ExpandableInfoButton on HomePage (index 0)
+              if (_currentPageIndex == 0) ExpandableInfoButton(),
+            ],
+          ),
+        ),
+      ],
+    );
+
+    // Conditionally wrap with scrollable content
+    if (shouldEnableScrolling) {
+      return Scaffold(
+        body: CustomScrollView(
+          slivers: [
+            // Scrollable AppBar (not pinned)
+            SliverAppBar(
+              pinned: false, // Changed to false to make it scrollable
+              floating: false,
+              snap: false,
+              expandedHeight: kToolbarHeight,
+              flexibleSpace: CustomAppBar(
+                currentPageIndex: _currentPageIndex,
+                onPageChanged: _changePage,
               ),
             ),
-            child: Column(
-              children: [
-                _buildAnimatedTextBar(context),
-                Expanded(
-                  child: Stack(
-                    children: [
-                      _buildResponsiveContent(context),
-                      // Ninja image positioned at center bottom
-                      Positioned(
-                        bottom: ninjaBottom,
-                        left: 0,
-                        right: 0,
-                        child: Center(
-                          child: Image.asset(
-                            'assets/ninja.png',
-                            height: ninjaSize,
-                            width: ninjaSize,
-                            filterQuality: FilterQuality.high,
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) => Icon(
-                              Icons.school,
-                              size: ninjaSize * 0.2,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                      // Existing jelly info button
-                      Positioned(
-                        right: infoButtonRight,
-                        bottom: infoButtonBottom,
-                        child: JellyInfoButton(
-                          showInfoList: _showInfoList,
-                          animationController: _animationController,
-                          scaleAnimation: _scaleAnimation,
-                          heightAnimation: _heightAnimation,
-                          onStartAnimation: _startAnimation,
-                          onReverseAnimation: _reverseAnimation,
-                          currentPageIndex: _currentPageIndex,
-                          onPageSelected: (pageIndex) {
-                            _changePage(pageIndex);
-                          },
-                        ),
-                      ),
-                      // NEW: Only show ExpandableInfoButton on HomePage (index 0)
-                      // Positioned properly for mobile screens
-                      if (_currentPageIndex == 0)
-                        Positioned(
-                          bottom: expandableButtonBottom,
-                          right: expandableButtonRight,
-                          child: ExpandableInfoButton(),
-                        ),
-                    ],
-                  ),
-                ),
-              ],
+
+            // Text bar
+            SliverToBoxAdapter(child: _buildAnimatedTextBar(context)),
+
+            // Main content
+            SliverToBoxAdapter(
+              child: SizedBox(height: screenHeight, child: mainContent),
             ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: CustomBottomNavBar(
-        hoveredIndex: _hoveredIndex,
-        onHover: (index) => setState(() => _hoveredIndex = index),
-      ),
-    );
+          ],
+        ),
+        bottomNavigationBar: CustomBottomNavBar(
+          hoveredIndex: _hoveredIndex,
+          onHover: (index) => setState(() => _hoveredIndex = index),
+        ),
+      );
+    } else {
+      // For large screens in landscape - no scrolling
+      return Scaffold(
+        body: Column(
+          children: [
+            // Fixed AppBar
+            SizedBox(
+              height: kToolbarHeight,
+              child: CustomAppBar(
+                currentPageIndex: _currentPageIndex,
+                onPageChanged: _changePage,
+              ),
+            ),
+
+            // Text bar
+            _buildAnimatedTextBar(context),
+
+            // Main content (expands to fill remaining space)
+            Expanded(child: mainContent),
+          ],
+        ),
+        bottomNavigationBar: CustomBottomNavBar(
+          hoveredIndex: _hoveredIndex,
+          onHover: (index) => setState(() => _hoveredIndex = index),
+        ),
+      );
+    }
   }
 
   Widget _buildAnimatedTextBar(BuildContext context) {
@@ -491,7 +525,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             large: 1600.0,
           ).clamp(1200.0, 1600.0); // Ensure valid range
 
-    return SingleChildScrollView(
+    return Container(
       padding: EdgeInsets.symmetric(
         horizontal: horizontalPadding,
         vertical: verticalPadding,
