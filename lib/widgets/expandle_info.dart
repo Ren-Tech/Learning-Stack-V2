@@ -82,27 +82,58 @@ class _ExpandableInfoButtonState extends State<ExpandableInfoButton> {
     );
   }
 
+  // Helper method to determine screen size category
+  ScreenSizeCategory _getScreenSizeCategory() {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    if (screenWidth < 600) {
+      return ScreenSizeCategory.small;
+    } else if (screenWidth < 900) {
+      return ScreenSizeCategory.medium;
+    } else {
+      return ScreenSizeCategory.large;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final rightPosition = screenWidth * 0.15;
+    final screenSize = _getScreenSizeCategory();
+    final isSmallScreen = screenSize == ScreenSizeCategory.small;
+    final isMediumScreen = screenSize == ScreenSizeCategory.medium;
+
+    // Responsive sizing
+    final mainBallSize = isSmallScreen ? 80.0 : (isMediumScreen ? 95.0 : 110.0);
+    final miniBallSize = isSmallScreen ? 55.0 : (isMediumScreen ? 65.0 : 75.0);
+    final orbitRadius = isSmallScreen ? 75.0 : (isMediumScreen ? 85.0 : 100.0);
+    final fontSize = isSmallScreen ? 10.0 : (isMediumScreen ? 11.0 : 13.0);
+    final mainBallFontSize = isSmallScreen
+        ? 10.0
+        : (isMediumScreen ? 12.0 : 14.0);
+
+    // Position based on screen size
+    final topPosition = isSmallScreen ? 20.0 : 50.0;
+    final rightPosition = isSmallScreen
+        ? 16.0
+        : (isMediumScreen
+              ? MediaQuery.of(context).size.width * 0.08
+              : MediaQuery.of(context).size.width * 0.15);
 
     return Positioned(
-      top: 50,
+      top: topPosition,
       right: rightPosition,
       child: MouseRegion(
         onEnter: (_) => _onHoverEnter(),
         onExit: (_) => _onHoverExit(),
         child: SizedBox(
-          width: 300,
-          height: 300,
+          width: orbitRadius * 2 + miniBallSize,
+          height: orbitRadius * 2 + miniBallSize,
           child: Stack(
             alignment: Alignment.center,
             children: [
               // Outer glow effect (static)
               Container(
-                width: 140 + (8 * 2), // Using initial elevation value
-                height: 140 + (8 * 2),
+                width: mainBallSize + (8 * 2),
+                height: mainBallSize + (8 * 2),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
@@ -117,8 +148,8 @@ class _ExpandableInfoButtonState extends State<ExpandableInfoButton> {
 
               // Main 3D ball with realistic sphere shading (static)
               Container(
-                width: 110,
-                height: 110,
+                width: mainBallSize,
+                height: mainBallSize,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
@@ -135,7 +166,7 @@ class _ExpandableInfoButtonState extends State<ExpandableInfoButton> {
                     // Main shadow
                     BoxShadow(
                       color: Colors.red.withOpacity(0.4),
-                      blurRadius: 8 * 1.5, // Initial elevation value
+                      blurRadius: 8 * 1.5,
                       offset: Offset(8 * 0.3, 8 * 0.8),
                       spreadRadius: 2,
                     ),
@@ -169,20 +200,23 @@ class _ExpandableInfoButtonState extends State<ExpandableInfoButton> {
                       ],
                     ),
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Text(
-                      'Instant\nAssessment',
+                      isSmallScreen ? 'Instant\nTest' : 'Instant\nAssessment',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 14,
+                        fontSize: mainBallFontSize,
                         fontWeight: FontWeight.bold,
                         height: 1.1,
                         shadows: [
                           Shadow(
                             color: Colors.black45,
-                            offset: Offset(1, 2),
-                            blurRadius: 3,
+                            offset: Offset(
+                              isSmallScreen ? 0.5 : 1,
+                              isSmallScreen ? 1 : 2,
+                            ),
+                            blurRadius: isSmallScreen ? 2 : 3,
                           ),
                         ],
                       ),
@@ -200,7 +234,7 @@ class _ExpandableInfoButtonState extends State<ExpandableInfoButton> {
 
                   // Calculate orbital position (static when expanded)
                   final baseAngle = (index * 90.0) * (math.pi / 180);
-                  final radius = _isExpanded ? 100.0 : 0.0;
+                  final radius = _isExpanded ? orbitRadius : 0.0;
                   final x = radius * math.cos(baseAngle);
                   final y = radius * math.sin(baseAngle);
 
@@ -215,8 +249,8 @@ class _ExpandableInfoButtonState extends State<ExpandableInfoButton> {
                           child: MouseRegion(
                             cursor: SystemMouseCursors.click,
                             child: Container(
-                              width: 75,
-                              height: 75,
+                              width: miniBallSize,
+                              height: miniBallSize,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 gradient: RadialGradient(
@@ -293,15 +327,20 @@ class _ExpandableInfoButtonState extends State<ExpandableInfoButton> {
                                       color: _clickedStates[index]
                                           ? Colors.black87
                                           : Colors.white,
-                                      fontSize: 13,
+                                      fontSize: fontSize,
                                       fontWeight: FontWeight.bold,
                                       shadows: _clickedStates[index]
                                           ? []
                                           : [
-                                              const Shadow(
+                                              Shadow(
                                                 color: Colors.black54,
-                                                offset: Offset(1, 2),
-                                                blurRadius: 3,
+                                                offset: Offset(
+                                                  isSmallScreen ? 0.5 : 1,
+                                                  isSmallScreen ? 1 : 2,
+                                                ),
+                                                blurRadius: isSmallScreen
+                                                    ? 2
+                                                    : 3,
                                               ),
                                             ],
                                     ),
@@ -321,7 +360,7 @@ class _ExpandableInfoButtonState extends State<ExpandableInfoButton> {
               if (_isExpanded)
                 ...List.generate(8, (index) {
                   final particleAngle = (index * 45.0) * (math.pi / 180);
-                  final particleRadius = 130.0;
+                  final particleRadius = orbitRadius + (miniBallSize / 2);
                   final px = particleRadius * math.cos(particleAngle);
                   final py = particleRadius * math.sin(particleAngle);
 
@@ -330,8 +369,8 @@ class _ExpandableInfoButtonState extends State<ExpandableInfoButton> {
                     child: Opacity(
                       opacity: 0.3,
                       child: Container(
-                        width: 6,
-                        height: 6,
+                        width: isSmallScreen ? 4 : 6,
+                        height: isSmallScreen ? 4 : 6,
                         decoration: BoxDecoration(
                           gradient: RadialGradient(
                             colors: [
@@ -344,8 +383,8 @@ class _ExpandableInfoButtonState extends State<ExpandableInfoButton> {
                           boxShadow: [
                             BoxShadow(
                               color: Colors.white.withOpacity(0.8),
-                              blurRadius: 6,
-                              spreadRadius: 2,
+                              blurRadius: isSmallScreen ? 4 : 6,
+                              spreadRadius: isSmallScreen ? 1 : 2,
                             ),
                           ],
                         ),
@@ -366,4 +405,10 @@ class InfoItem {
   final LinearGradient gradient;
 
   InfoItem(this.text, this.gradient);
+}
+
+enum ScreenSizeCategory {
+  small, // < 600px
+  medium, // 600-900px
+  large, // > 900px
 }
