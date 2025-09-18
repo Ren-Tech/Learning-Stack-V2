@@ -214,6 +214,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
     final infoButtonBottom = screenWidth <= 480 ? 16.0 : 0.0;
 
+    // Position for ExpandableInfoButton on mobile
+    final expandableButtonBottom = isMobile
+        ? screenHeight *
+              0.15 // Position higher on mobile to avoid overlap
+        : 0.0;
+
+    final expandableButtonRight = isMobile
+        ? screenWidth *
+              0.05 // Position from right edge on mobile
+        : 0.0;
+
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
@@ -312,7 +323,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         ),
                       ),
                       // NEW: Only show ExpandableInfoButton on HomePage (index 0)
-                      if (_currentPageIndex == 0) ExpandableInfoButton(),
+                      // Positioned properly for mobile screens
+                      if (_currentPageIndex == 0)
+                        Positioned(
+                          bottom: expandableButtonBottom,
+                          right: expandableButtonRight,
+                          child: ExpandableInfoButton(),
+                        ),
                     ],
                   ),
                 ),
