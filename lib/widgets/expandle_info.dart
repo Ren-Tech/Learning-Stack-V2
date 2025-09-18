@@ -209,7 +209,9 @@ class _ExpandableInfoButtonState extends State<ExpandableInfoButton> {
                 ),
                 child: Center(
                   child: Text(
-                    isSmallScreen ? 'Instant\nTest' : 'Instant\nAssessment',
+                    isSmallScreen
+                        ? 'Instant\nAssessment'
+                        : 'Instant\nAssessment',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white,

@@ -24,8 +24,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   // Map page indices to their corresponding background images
   final Map<int, String> _backgroundImages = {
-    0: 'assets/home.png', // Primary/Home page
-    1: 'assets/primary.png', // Primary page
+    0: 'assets/home_dia.png', // Primary/Home page
+    1: 'assets/primary_dia.png', // Primary page
     2: 'assets/pre_shool.png', // Pre School page
     3: 'assets/11+.png', // 11+ page
     4: 'assets/GCSE.png', // GCSE's page
@@ -34,8 +34,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   // Map for mobile-specific background images
   final Map<int, String> _mobileBackgroundImages = {
-    0: 'assets/hm.png', // Home page mobile
-    1: 'assets/primary_mobile.png', // Primary page mobile
+    0: 'assets/home_dia_mobile.png', // Home page mobile
+    1: 'assets/primary_dia_mobile.png', // Primary page mobile
     2: 'assets/pre_school_mobile.png', // Pre School mobile
     3: 'assets/11+__mobile.png', // 11+ page mobile
     4: 'assets/GCSE_mobile.png', // GCSE's page mobile
