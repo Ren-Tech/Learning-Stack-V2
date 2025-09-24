@@ -6,6 +6,7 @@ import '../widgets/bottom_nav_bar.dart';
 import '../widgets/info_button.dart';
 import '../widgets/center_content.dart';
 import '../models/page_data.dart';
+import 'dart:async'; // Add this import for Timer
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -21,6 +22,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late Animation<double> _scaleAnimation;
   late Animation<double> _heightAnimation;
   int _currentPageIndex = 0;
+
+  // New state variables for mobile tap-and-hold
+  bool _isLongPressing = false;
+  Timer? _longPressTimer;
 
   // Map page indices to their corresponding background images
   final Map<int, String> _backgroundImages = {
@@ -68,6 +73,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   void dispose() {
     _animationController.dispose();
+    _longPressTimer?.cancel(); // Cancel timer on dispose
     super.dispose();
   }
 
@@ -86,6 +92,27 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     setState(() {
       _currentPageIndex = pageIndex;
     });
+  }
+
+  // Add methods for handling long press
+  void _startLongPress() {
+    _longPressTimer?.cancel();
+    _longPressTimer = Timer(const Duration(milliseconds: 300), () {
+      if (mounted) {
+        setState(() {
+          _isLongPressing = true;
+        });
+      }
+    });
+  }
+
+  void _endLongPress() {
+    _longPressTimer?.cancel();
+    if (mounted) {
+      setState(() {
+        _isLongPressing = false;
+      });
+    }
   }
 
   // Get the background image asset path for the current page
@@ -331,14 +358,27 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         right: 0,
                         bottom: 0,
                         child: Center(
-                          child: ExpandableInfoButton(onNavigate: _changePage),
+                          child: ExpandableInfoButton(
+                            onNavigate: _changePage,
+                            // Pass long press state for mobile
+                            isMobile: isMobile,
+                            isLongPressing: _isLongPressing,
+                            onLongPressStart: isMobile ? _startLongPress : null,
+                            onLongPressEnd: isMobile ? _endLongPress : null,
+                          ),
                         ),
                       )
                     : // Positioned for desktop/landscape with proper positioning
                       Positioned(
                         top: 50.0,
                         right: screenWidth * 0.15,
-                        child: ExpandableInfoButton(onNavigate: _changePage),
+                        child: ExpandableInfoButton(
+                          onNavigate: _changePage,
+                          isMobile: isMobile,
+                          isLongPressing: _isLongPressing,
+                          onLongPressStart: isMobile ? _startLongPress : null,
+                          onLongPressEnd: isMobile ? _endLongPress : null,
+                        ),
                       ),
             ],
           ),
