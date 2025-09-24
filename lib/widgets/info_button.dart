@@ -24,9 +24,15 @@ class JellyInfoButton extends StatelessWidget {
     required this.currentPageIndex,
   });
 
+  bool _isMobile(BuildContext context) {
+    return MediaQuery.of(context).size.width <= 768;
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenSize = ScreenSizeUtils.getScreenSize(context);
+    final isMobile = _isMobile(context);
+
     final buttonSize = screenSize == ScreenSize.small
         ? 80.0 // Increased from 60.0
         : screenSize == ScreenSize.medium
@@ -47,9 +53,11 @@ class JellyInfoButton extends StatelessWidget {
     ];
 
     return MouseRegion(
-      onEnter: (_) => onStartAnimation(),
-      onExit: (_) => onReverseAnimation(),
+      // Only enable hover for non-mobile devices
+      onEnter: isMobile ? null : (_) => onStartAnimation(),
+      onExit: isMobile ? null : (_) => onReverseAnimation(),
       child: GestureDetector(
+        // Handle tap for both mobile and desktop
         onTap: () => showInfoList ? onReverseAnimation() : onStartAnimation(),
         child: AnimatedBuilder(
           animation: animationController,
@@ -64,7 +72,9 @@ class JellyInfoButton extends StatelessWidget {
                     ..translate(0.0, showInfoList ? -15.0 : 0.0)
                     ..scale(showInfoList ? 1.3 : 1.0),
                   child: GestureDetector(
-                    onTap: () {},
+                    onTap: () => showInfoList
+                        ? onReverseAnimation()
+                        : onStartAnimation(),
                     child: MouseRegion(
                       cursor: SystemMouseCursors.click,
                       child: _buildHighQualityImage(buttonSize),
@@ -99,7 +109,9 @@ class JellyInfoButton extends StatelessWidget {
                       color: Colors.blue,
                       child: InkWell(
                         borderRadius: BorderRadius.circular(16),
-                        onTap: () {},
+                        onTap: () => showInfoList
+                            ? onReverseAnimation()
+                            : onStartAnimation(),
                         child: Container(
                           padding: EdgeInsets.all(
                             screenSize == ScreenSize.small ? 8 : 12,
