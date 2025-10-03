@@ -6,7 +6,7 @@ import '../widgets/bottom_nav_bar.dart';
 import '../widgets/info_button.dart';
 import '../widgets/center_content.dart';
 import '../models/page_data.dart';
-import 'dart:async'; // Add this import for Timer
+import 'dart:async';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -23,28 +23,33 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late Animation<double> _heightAnimation;
   int _currentPageIndex = 0;
 
-  // New state variables for mobile tap-and-hold
   bool _isLongPressing = false;
   Timer? _longPressTimer;
 
   // Map page indices to their corresponding background images
   final Map<int, String> _backgroundImages = {
-    0: 'assets/home_dia.png', // Primary/Home page
-    1: 'assets/primary_dia.png', // Primary page
-    2: 'assets/pre_shool.png', // Pre School page
-    3: 'assets/11+.png', // 11+ page
-    4: 'assets/GCSE.png', // GCSE's page
-    5: 'assets/alevels.png', // A-Levels page
+    0: 'assets/home_dia.png',
+    1: 'assets/primary_dia.png',
+    2: 'assets/pre_shool.png',
+    3: 'assets/11+.png',
+    4: 'assets/GCSE.png',
+    5: 'assets/alevels.png',
   };
 
   // Map for mobile-specific background images
   final Map<int, String> _mobileBackgroundImages = {
-    0: 'assets/home_dia_mobile.png', // Home page mobile
-    1: 'assets/primary_dia_mobile.png', // Primary page mobile
-    2: 'assets/pre_school_mobile.png', // Pre School mobile
-    3: 'assets/11+__mobile.png', // 11+ page mobile
-    4: 'assets/GCSE_mobile.png', // GCSE's page mobile
-    5: 'assets/alevels_mobile.png', // A-Levels page mobile
+    0: 'assets/home_dia_mob.png',
+    1: 'assets/primary_mob.png',
+    2: 'assets/pre_school_mobile.png',
+    3: 'assets/11+__mobile.png',
+    4: 'assets/gcse_mob.png',
+    5: 'assets/alevels_mobile.png',
+  };
+
+  // Map for landscape-specific background images (for tablets/smaller devices)
+  final Map<int, String> _landscapeBackgroundImages = {
+    0: 'assets/land_home.png',
+    4: 'assets/land_gcse.png',
   };
 
   @override
@@ -73,7 +78,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   void dispose() {
     _animationController.dispose();
-    _longPressTimer?.cancel(); // Cancel timer on dispose
+    _longPressTimer?.cancel();
     super.dispose();
   }
 
@@ -94,7 +99,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     });
   }
 
-  // Add methods for handling long press
   void _startLongPress() {
     _longPressTimer?.cancel();
     _longPressTimer = Timer(const Duration(milliseconds: 300), () {
@@ -115,44 +119,109 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
   }
 
-  // Get the background image asset path for the current page
+  // UPDATED: Get the background image asset path for the current page
   String _getCurrentBackgroundImage() {
+    final orientation = MediaQuery.of(context).orientation;
     final screenWidth = MediaQuery.of(context).size.width;
-    final isMobile = screenWidth <= 768; // Mobile breakpoint
+    final isMobile = screenWidth <= 768;
+    final isLargeScreen = screenWidth > 1024; // Laptop/computer screens
 
+    // Check if device is in landscape mode
+    if (orientation == Orientation.landscape) {
+      // For large screens (laptops/computers), use _backgroundImages
+      if (isLargeScreen) {
+        return _backgroundImages[_currentPageIndex] ?? 'assets/home_dia.png';
+      }
+
+      // For smaller landscape devices (tablets), use landscape images if available
+      return _landscapeBackgroundImages[_currentPageIndex] ??
+          _backgroundImages[_currentPageIndex] ??
+          'assets/home_dia.png';
+    }
+
+    // Portrait mode - use mobile images for mobile devices
     if (isMobile) {
       return _mobileBackgroundImages[_currentPageIndex] ??
-          'assets/home_mobile.png';
+          'assets/home_dia_mob.png';
     } else {
-      return _backgroundImages[_currentPageIndex] ?? 'assets/homepage.png';
+      return _backgroundImages[_currentPageIndex] ?? 'assets/home_dia.png';
     }
   }
 
-  // Get the appropriate background image scale based on screen size
-  double _getBackgroundImageScale() {
+  // NEW: Get appropriate image fit based on screen size and orientation
+  BoxFit _getBackgroundImageFit() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final orientation = MediaQuery.of(context).orientation;
+
+    // For very large screens, use contain to prevent cutting
+    if (screenWidth > 1440) {
+      return BoxFit.contain;
+    }
+
+    // For large landscape screens, use contain
+    if (orientation == Orientation.landscape && screenWidth > 1024) {
+      return BoxFit.contain;
+    }
+
+    // For all other cases, use cover
+    return BoxFit.cover;
+  }
+
+  // NEW: Get background alignment based on screen size
+  Alignment _getBackgroundAlignment() {
     final screenWidth = MediaQuery.of(context).size.width;
 
-    // Keep original size on mobile (scale 1.0)
-    if (screenWidth <= 768) {
-      return 1.0;
+    // For very large screens, center the image
+    if (screenWidth > 1440) {
+      return Alignment.center;
     }
 
-    // For larger screens, scale down based on screen width
-    if (screenWidth <= 1024) {
-      return 0.9;
-    }
-    if (screenWidth <= 1200) {
-      return 0.85;
-    }
-    if (screenWidth <= 1400) {
-      return 0.8;
+    // For large screens, center the image
+    if (screenWidth > 1024) {
+      return Alignment.center;
     }
 
-    // For very large screens
-    return 0.75;
+    // Default alignment
+    return Alignment.center;
   }
 
-  // Enhanced responsive calculations with NaN protection
+  // NEW: Get background color for areas not covered by contained images
+  Color _getBackgroundColor() {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // For large screens where we use BoxFit.contain, add a background color
+    if (screenWidth > 1024) {
+      return const Color(0x00ffffff); // Use your app's primary green color
+    }
+
+    return Colors.transparent;
+  }
+
+  // Debug method to check which image is being used
+  void _debugImageSelection() {
+    final orientation = MediaQuery.of(context).orientation;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth <= 768;
+    final isLargeScreen = screenWidth > 1024;
+    final landscapeImage = _landscapeBackgroundImages[_currentPageIndex];
+    final mobileImage = _mobileBackgroundImages[_currentPageIndex];
+    final regularImage = _backgroundImages[_currentPageIndex];
+
+    print('=== DEBUG IMAGE SELECTION ===');
+    print('Orientation: $orientation');
+    print('Screen Width: $screenWidth');
+    print('Is Mobile: $isMobile');
+    print('Is Large Screen: $isLargeScreen');
+    print('Current Page: $_currentPageIndex');
+    print('Landscape Image: $landscapeImage');
+    print('Mobile Image: $mobileImage');
+    print('Regular Image: $regularImage');
+    print('Selected Image: ${_getCurrentBackgroundImage()}');
+    print('Background Fit: ${_getBackgroundImageFit()}');
+    print('Background Alignment: ${_getBackgroundAlignment()}');
+    print('=============================');
+  }
+
   double _getResponsiveValue({
     required BuildContext context,
     required double small,
@@ -161,8 +230,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     double? extraLarge,
   }) {
     final width = MediaQuery.of(context).size.width;
-
-    // Protect against invalid values
     if (!width.isFinite || width <= 0) return small;
 
     if (width <= 480) return small;
@@ -186,114 +253,157 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   double _getScreenWidth(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    return width.isFinite && width > 0
-        ? width
-        : 320.0; // Fallback to minimum mobile width
+    return width.isFinite && width > 0 ? width : 320.0;
   }
 
   double _getScreenHeight(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
-    return height.isFinite && height > 0
-        ? height
-        : 568.0; // Fallback to minimum mobile height
+    return height.isFinite && height > 0 ? height : 568.0;
   }
 
-  // Helper method to determine if we should enable scrolling
   bool _shouldEnableScrolling() {
     final screenWidth = _getScreenWidth(context);
     final orientation = MediaQuery.of(context).orientation;
-
-    // Enable scrolling on small screens (mobile) OR in portrait mode
     return screenWidth <= 768 || orientation == Orientation.portrait;
   }
 
-  // Helper method to determine if we should center the ExpandableInfoButton
   bool _shouldCenterExpandableInfo() {
     final screenWidth = _getScreenWidth(context);
     final orientation = MediaQuery.of(context).orientation;
-
-    // Center on mobile screens OR in portrait mode
     return screenWidth <= 768 || orientation == Orientation.portrait;
+  }
+
+  bool _isLandscapeMode() {
+    return MediaQuery.of(context).orientation == Orientation.landscape;
+  }
+
+  // UPDATED: Adjust ninja positioning for better placement on large screens
+  double _getNinjaBottomPosition() {
+    final orientation = MediaQuery.of(context).orientation;
+    final screenHeight = _getScreenHeight(context);
+    final screenWidth = _getScreenWidth(context);
+
+    // For very large screens, adjust ninja position
+    if (screenWidth > 1440) {
+      if (orientation == Orientation.landscape) {
+        return -80.0;
+      } else {
+        return 60.0;
+      }
+    }
+
+    if (orientation == Orientation.landscape) {
+      return _getResponsiveValue(
+        context: context,
+        small: screenHeight < 600 ? -30.0 : -40.0,
+        medium: -70.0,
+        large: -110.0,
+        extraLarge: -120.0,
+      );
+    } else {
+      return _getResponsiveValue(
+        context: context,
+        small: screenHeight < 600 ? 20.0 : 40.0,
+        medium: 60.0,
+        large: 80.0,
+        extraLarge: 100.0,
+      );
+    }
+  }
+
+  // UPDATED: Adjust ninja size for better scaling on large screens
+  double _getNinjaSize() {
+    final orientation = MediaQuery.of(context).orientation;
+    final screenWidth = _getScreenWidth(context);
+
+    // For very large screens, limit the maximum ninja size
+    if (screenWidth > 1440) {
+      if (orientation == Orientation.landscape) {
+        return 280.0;
+      } else {
+        return 200.0;
+      }
+    }
+
+    if (orientation == Orientation.landscape) {
+      return _getResponsiveValue(
+        context: context,
+        small: 100.0,
+        medium: 180.0,
+        large: 280.0,
+        extraLarge: 320.0,
+      );
+    } else {
+      return _getResponsiveValue(
+        context: context,
+        small: 80.0,
+        medium: 120.0,
+        large: 160.0,
+        extraLarge: 180.0,
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _debugImageSelection();
+    });
+
     final screenWidth = _getScreenWidth(context);
     final screenHeight = _getScreenHeight(context);
     final isMobile = screenWidth <= 768;
+    final isLandscape = _isLandscapeMode();
     final shouldEnableScrolling = _shouldEnableScrolling();
     final shouldCenterExpandableInfo = _shouldCenterExpandableInfo();
 
-    // More granular responsive sizing
-    final ninjaSize = _getResponsiveValue(
+    final ninjaSize = _getNinjaSize();
+    final ninjaBottom = _getNinjaBottomPosition();
+
+    final ninjaPadding = _getResponsiveValue(
       context: context,
-      small: 140.0,
-      medium: 200.0,
-      large: 280.0,
-      extraLarge: 320.0,
+      small: 30.0,
+      medium: 40.0,
+      large: 50.0,
+      extraLarge: 60.0,
     );
 
-    final ninjaBottom = _getResponsiveValue(
-      context: context,
-      small: screenHeight < 600 ? -50.0 : -70.0,
-      medium: -90.0,
-      large: -110.0,
-      extraLarge: -120.0,
-    );
-
-    // Adjusted positioning for ninja image - moved more to the left
-    final ninjaLeft = _getResponsiveValue(
-      context: context,
-      small: screenWidth * 0.1, // 10% from left on mobile
-      medium: screenWidth * 0.15, // 15% from left on medium screens
-      large: screenWidth * 0.2, // 20% from left on large screens
-      extraLarge: screenWidth * 0.25, // 25% from left on extra large
-    );
-
-    // Adjusted positioning for info button - moved more to the left
     final infoButtonRight = _getResponsiveValue(
       context: context,
-      small: 30.0, // Reduced from 16.0
-      medium: screenWidth * 0.05, // Reduced from 0.08
-      large: screenWidth * 0.04, // Reduced from 0.06
-      extraLarge: 60.0, // Reduced from 90.0
+      small: 30.0,
+      medium: screenWidth * 0.05,
+      large: screenWidth * 0.04,
+      extraLarge: 60.0,
     );
 
     final infoButtonBottom = screenWidth <= 480 ? 16.0 : 0.0;
 
-    // Main content widget
+    final currentBackgroundImage = _getCurrentBackgroundImage();
+    final backgroundFit = _getBackgroundImageFit();
+    final backgroundAlignment = _getBackgroundAlignment();
+    final backgroundColor = _getBackgroundColor();
+
+    // UPDATED: Main content with improved background handling
     Widget mainContent = Stack(
       children: [
-        // Background image with conditional scaling
-        isMobile
-            ? Container(
-                width: double.infinity,
-                height: screenHeight,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage(_getCurrentBackgroundImage()),
-                    fit: BoxFit.cover, // Use cover on mobile
-                    alignment: Alignment.center,
-                    filterQuality: FilterQuality.high,
-                  ),
-                ),
-              )
-            : Transform.scale(
-                scale:
-                    _getBackgroundImageScale(), // Scale down on larger screens
-                child: Container(
-                  width: double.infinity,
-                  height: screenHeight,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage(_getCurrentBackgroundImage()),
-                      fit: BoxFit.cover,
-                      alignment: Alignment.center,
-                      filterQuality: FilterQuality.high,
-                    ),
-                  ),
-                ),
+        // Background with proper fit and color
+        Container(
+          width: double.infinity,
+          height: screenHeight,
+          color: backgroundColor, // Background color for contained images
+          child: Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(currentBackgroundImage),
+                fit:
+                    backgroundFit, // Use contain for large screens to prevent cutting
+                alignment: backgroundAlignment,
+                filterQuality: FilterQuality.high,
               ),
+            ),
+          ),
+        ),
+
         // Content overlay with gradient for better text visibility
         Container(
           height: screenHeight,
@@ -311,26 +421,34 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           child: Stack(
             children: [
               _buildResponsiveContent(context),
-              // Ninja image positioned at center bottom
+
+              // Ninja image positioned at center bottom with padding
               Positioned(
                 bottom: ninjaBottom,
-                left: 0,
-                right: 0,
+                left: ninjaPadding,
+                right: ninjaPadding,
                 child: Center(
-                  child: Image.asset(
-                    'assets/ninja.png',
-                    height: ninjaSize,
-                    width: ninjaSize,
-                    filterQuality: FilterQuality.high,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) => Icon(
-                      Icons.school,
-                      size: ninjaSize * 0.2,
-                      color: Colors.white,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: screenWidth - (ninjaPadding * 2),
+                      maxHeight: ninjaSize,
+                    ),
+                    child: Image.asset(
+                      'assets/ninja.png',
+                      height: ninjaSize,
+                      width: ninjaSize,
+                      filterQuality: FilterQuality.high,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) => Icon(
+                        Icons.school,
+                        size: ninjaSize * 0.2,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
               ),
+
               // Existing jelly info button
               Positioned(
                 right: infoButtonRight,
@@ -348,11 +466,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   },
                 ),
               ),
-              // UPDATED: ExpandableInfoButton with conditional centering and navigation
+
+              // ExpandableInfoButton with conditional centering and navigation
               if (_currentPageIndex == 0)
                 shouldCenterExpandableInfo
-                    ? // Centered positioning for mobile/portrait
-                      Positioned(
+                    ? Positioned(
                         top: 0,
                         left: 0,
                         right: 0,
@@ -360,7 +478,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         child: Center(
                           child: ExpandableInfoButton(
                             onNavigate: _changePage,
-                            // Pass long press state for mobile
                             isMobile: isMobile,
                             isLongPressing: _isLongPressing,
                             onLongPressStart: isMobile ? _startLongPress : null,
@@ -368,8 +485,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           ),
                         ),
                       )
-                    : // Positioned for desktop/landscape with proper positioning
-                      Positioned(
+                    : Positioned(
                         top: 50.0,
                         right: screenWidth * 0.15,
                         child: ExpandableInfoButton(
@@ -386,14 +502,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ],
     );
 
-    // Conditionally wrap with scrollable content
     if (shouldEnableScrolling) {
       return Scaffold(
         body: CustomScrollView(
           slivers: [
-            // Scrollable AppBar (not pinned)
             SliverAppBar(
-              pinned: false, // Changed to false to make it scrollable
+              pinned: false,
               floating: false,
               snap: false,
               expandedHeight: kToolbarHeight,
@@ -402,11 +516,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 onPageChanged: _changePage,
               ),
             ),
-
-            // Text bar
             SliverToBoxAdapter(child: _buildAnimatedTextBar(context)),
-
-            // Main content
             SliverToBoxAdapter(
               child: SizedBox(height: screenHeight, child: mainContent),
             ),
@@ -418,11 +528,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
       );
     } else {
-      // For large screens in landscape - no scrolling
       return Scaffold(
         body: Column(
           children: [
-            // Fixed AppBar
             SizedBox(
               height: kToolbarHeight,
               child: CustomAppBar(
@@ -430,11 +538,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 onPageChanged: _changePage,
               ),
             ),
-
-            // Text bar
             _buildAnimatedTextBar(context),
-
-            // Main content (expands to fill remaining space)
             Expanded(child: mainContent),
           ],
         ),
@@ -448,6 +552,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Widget _buildAnimatedTextBar(BuildContext context) {
     final screenWidth = _getScreenWidth(context);
+    final isPortrait = !_isLandscapeMode();
 
     final barHeight = _getResponsiveValue(
       context: context,
@@ -465,8 +570,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       extraLarge: 24.0,
     );
 
-    // Enhanced breakpoint for layout switching
-    final useSmallLayout = screenWidth <= 600;
+    final useSmallLayout = screenWidth <= 600 || isPortrait;
 
     return Container(
       height: barHeight,
@@ -566,6 +670,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Widget _buildResponsiveContent(BuildContext context) {
     final screenWidth = _getScreenWidth(context);
+    final isPortrait = !_isLandscapeMode();
 
     final horizontalPadding = _getResponsiveValue(
       context: context,
@@ -583,14 +688,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       extraLarge: 28.0,
     );
 
-    final maxWidth = screenWidth <= 768
+    final maxWidth = screenWidth <= 768 || isPortrait
         ? double.infinity
         : _getResponsiveValue(
             context: context,
             small: 1200.0,
             medium: 1400.0,
             large: 1600.0,
-          ).clamp(1200.0, 1600.0); // Ensure valid range
+          ).clamp(1200.0, 1600.0);
 
     return Container(
       padding: EdgeInsets.symmetric(
@@ -625,16 +730,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       extraLarge: 120.0,
     );
 
-    // Mobile layout (portrait phones and small screens)
+    final isPortrait = !_isLandscapeMode();
+
     if (screenWidth <= 480) {
       return _buildMobileLayout(spacingBetweenElements, bottomSpacing);
-    }
-    // Tablet portrait layout
-    else if (screenWidth <= 768) {
+    } else if (screenWidth <= 768 || isPortrait) {
       return _buildTabletLayout(spacingBetweenElements, bottomSpacing);
-    }
-    // Desktop layout
-    else {
+    } else {
       return _buildDesktopLayout(spacingBetweenElements, bottomSpacing);
     }
   }
@@ -642,7 +744,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget _buildMobileLayout(double spacing, double bottomSpacing) {
     return Column(
       children: [
-        // Center content at top on mobile
         CenterContent(currentPageIndex: _currentPageIndex),
         SizedBox(height: bottomSpacing),
       ],
@@ -652,7 +753,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget _buildTabletLayout(double spacing, double bottomSpacing) {
     return Column(
       children: [
-        // Center content at top
         CenterContent(currentPageIndex: _currentPageIndex),
         SizedBox(height: bottomSpacing),
       ],
@@ -662,7 +762,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget _buildDesktopLayout(double spacing, double bottomSpacing) {
     return Column(
       children: [
-        // Center content for desktop
         CenterContent(currentPageIndex: _currentPageIndex),
         SizedBox(height: bottomSpacing),
       ],
