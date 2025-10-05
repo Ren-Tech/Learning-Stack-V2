@@ -261,10 +261,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return height.isFinite && height > 0 ? height : 568.0;
   }
 
+  // FIXED: Only enable scrolling for mobile landscape mode
   bool _shouldEnableScrolling() {
     final screenWidth = _getScreenWidth(context);
     final orientation = MediaQuery.of(context).orientation;
-    return screenWidth <= 768 || orientation == Orientation.portrait;
+
+    // Enable scrolling for:
+    // 1. All portrait modes
+    // 2. Mobile landscape (screenWidth <= 768)
+    // Keep computer landscape (screenWidth > 768) as non-scrolling
+    return orientation == Orientation.portrait || screenWidth <= 768;
   }
 
   bool _shouldCenterExpandableInfo() {
@@ -502,6 +508,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ],
     );
 
+    // FIXED: Only use scrolling structure for mobile landscape and portrait modes
+    // Keep computer landscape as non-scrolling
     if (shouldEnableScrolling) {
       return Scaffold(
         body: CustomScrollView(
@@ -528,6 +536,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
       );
     } else {
+      // This is for computer landscape mode (non-scrolling)
       return Scaffold(
         body: Column(
           children: [
