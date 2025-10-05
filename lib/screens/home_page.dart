@@ -7,6 +7,8 @@ import '../widgets/info_button.dart';
 import '../widgets/center_content.dart';
 import '../models/page_data.dart';
 import 'dart:async';
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -133,13 +135,21 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         return _backgroundImages[_currentPageIndex] ?? 'assets/home_dia.png';
       }
 
-      // For smaller landscape devices (tablets), use landscape images if available
+      // For smaller landscape devices (tablets/mobile), use landscape images if available
+      // Otherwise fall back to mobile images for small screens
+      if (isMobile) {
+        return _landscapeBackgroundImages[_currentPageIndex] ??
+            _mobileBackgroundImages[_currentPageIndex] ??
+            _backgroundImages[_currentPageIndex] ??
+            'assets/home_dia.png';
+      }
+
       return _landscapeBackgroundImages[_currentPageIndex] ??
           _backgroundImages[_currentPageIndex] ??
           'assets/home_dia.png';
     }
 
-    // Portrait mode - use mobile images for mobile devices
+    // Portrait mode - use mobile images for mobile/small screens
     if (isMobile) {
       return _mobileBackgroundImages[_currentPageIndex] ??
           'assets/home_dia_mob.png';
@@ -197,31 +207,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return Colors.transparent;
   }
 
-  // Debug method to check which image is being used
-  void _debugImageSelection() {
-    final orientation = MediaQuery.of(context).orientation;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isMobile = screenWidth <= 768;
-    final isLargeScreen = screenWidth > 1024;
-    final landscapeImage = _landscapeBackgroundImages[_currentPageIndex];
-    final mobileImage = _mobileBackgroundImages[_currentPageIndex];
-    final regularImage = _backgroundImages[_currentPageIndex];
-
-    print('=== DEBUG IMAGE SELECTION ===');
-    print('Orientation: $orientation');
-    print('Screen Width: $screenWidth');
-    print('Is Mobile: $isMobile');
-    print('Is Large Screen: $isLargeScreen');
-    print('Current Page: $_currentPageIndex');
-    print('Landscape Image: $landscapeImage');
-    print('Mobile Image: $mobileImage');
-    print('Regular Image: $regularImage');
-    print('Selected Image: ${_getCurrentBackgroundImage()}');
-    print('Background Fit: ${_getBackgroundImageFit()}');
-    print('Background Alignment: ${_getBackgroundAlignment()}');
-    print('=============================');
-  }
-
   double _getResponsiveValue({
     required BuildContext context,
     required double small,
@@ -261,16 +246,38 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return height.isFinite && height > 0 ? height : 568.0;
   }
 
-  // FIXED: Only enable scrolling for mobile landscape mode
-  bool _shouldEnableScrolling() {
+  // FIXED: Better mobile detection for web
+  bool _isMobileDevice() {
     final screenWidth = _getScreenWidth(context);
+    final screenHeight = _getScreenHeight(context);
     final orientation = MediaQuery.of(context).orientation;
 
-    // Enable scrolling for:
-    // 1. All portrait modes
-    // 2. Mobile landscape (screenWidth <= 768)
-    // Keep computer landscape (screenWidth > 768) as non-scrolling
-    return orientation == Orientation.portrait || screenWidth <= 768;
+    // For web, use screen size detection
+    if (kIsWeb) {
+      // Consider it mobile if screen width is small OR if it's a typical mobile aspect ratio
+      return screenWidth <= 768 || (screenWidth / screenHeight) <= 1.2;
+    }
+
+    // For native apps, use the existing logic
+    return screenWidth <= 768;
+  }
+
+  // UPDATED: Enable scrolling for landscape mode on ALL pages
+  bool _shouldEnableScrolling() {
+    final orientation = MediaQuery.of(context).orientation;
+
+    // Always enable scrolling in landscape mode for all pages
+    if (orientation == Orientation.landscape) {
+      return true;
+    }
+
+    // Also enable scrolling for mobile devices in portrait
+    if (_isMobileDevice()) {
+      return true;
+    }
+
+    // For larger screens in portrait, enable scrolling
+    return orientation == Orientation.portrait;
   }
 
   bool _shouldCenterExpandableInfo() {
@@ -352,13 +359,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _debugImageSelection();
-    });
-
     final screenWidth = _getScreenWidth(context);
     final screenHeight = _getScreenHeight(context);
-    final isMobile = screenWidth <= 768;
+    final isMobile = _isMobileDevice();
     final isLandscape = _isLandscapeMode();
     final shouldEnableScrolling = _shouldEnableScrolling();
     final shouldCenterExpandableInfo = _shouldCenterExpandableInfo();
@@ -401,8 +404,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: AssetImage(currentBackgroundImage),
-                fit:
-                    backgroundFit, // Use contain for large screens to prevent cutting
+                fit: backgroundFit,
                 alignment: backgroundAlignment,
                 filterQuality: FilterQuality.high,
               ),
@@ -508,8 +510,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ],
     );
 
-    // FIXED: Only use scrolling structure for mobile landscape and portrait modes
-    // Keep computer landscape as non-scrolling
+    // UPDATED: Always use scrolling layout when shouldEnableScrolling is true
     if (shouldEnableScrolling) {
       return Scaffold(
         body: CustomScrollView(
@@ -536,7 +537,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
       );
     } else {
-      // This is for computer landscape mode (non-scrolling)
+      // This branch will rarely be used now (only for very specific cases)
       return Scaffold(
         body: Column(
           children: [
